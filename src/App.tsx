@@ -50,53 +50,30 @@ export const App: React.FC = () => {
         />
 
         {/* Main Content with Green Signal Rail */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 space-y-6">
           <div className="cyber-rail pl-4 sm:pl-6 space-y-6">
-            {/* Public Overview & Metrics */}
+            {/* 1. Public Overview & Metric Cards */}
             <PublicOverview onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
 
-            {/* Active Tab View */}
-            <div className="pt-2">
-              {activeTab === 'daily' && (
+            {/* 2. Primary Data Views */}
+            {activeTab === 'daily' && (
+              <div className="space-y-6">
                 <DailyLateTracker onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
-              )}
-
-              {activeTab === 'summary' && (
-                <IndividualSummaryTable onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
-              )}
-
-              {activeTab === 'all' && (
-                <AllRecordsExplorer onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
-              )}
-
-              {activeTab === 'analytics' && <AnalyticsCharts />}
-            </div>
-          </div>
-
-          {/* Large Electric Green Statement */}
-          <div className="mt-12 p-6 sm:p-8 bg-[#090e0b] border border-[#304c3b] relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-2 h-2 bg-[#65f8ff]" />
-            <div className="absolute bottom-0 left-0 w-2 h-2 bg-[#ff65d8]" />
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <p className="text-[10px] text-[#65f8ff] uppercase tracking-wider mb-1">
-                  // DISCIPLINE_DIRECTIVE_09
-                </p>
-                <h3 className="font-display text-xl sm:text-2xl font-black text-[#38ff8e] uppercase tracking-tight">
-                  PUNCTUALITY IS NON-NEGOTIABLE. SIGNAL OVER NOISE.
-                </h3>
-                <p className="text-xs text-[#c2cbc5] mt-1">
-                  Enforcing standardized operational rigor for modern builders. Flat ₹100 levy recorded dynamically with 0ms replication.
-                </p>
+                <div className="pt-2">
+                  <IndividualSummaryTable onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={handleAdminAccess}
-                className="px-4 py-2 text-xs font-mono font-bold uppercase text-[#020303] bg-[#38ff8e] border border-[#38ff8e] hover:bg-transparent hover:text-[#38ff8e] clip-corner-diagonal shrink-0"
-              >
-                ADMIN_ACCESS_GATE
-              </button>
-            </div>
+            )}
+
+            {activeTab === 'summary' && (
+              <IndividualSummaryTable onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
+            )}
+
+            {activeTab === 'all' && (
+              <AllRecordsExplorer onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
+            )}
+
+            {activeTab === 'analytics' && <AnalyticsCharts />}
           </div>
         </main>
       </div>
@@ -115,26 +92,26 @@ export const App: React.FC = () => {
         onSuccess={handleLoginSuccess}
       />
 
-      {/* Compact Directory Footer */}
-      <footer className="mt-12 bg-[#090e0b] border-t border-[#304c3b] py-6 text-xs text-[#c2cbc5] font-mono">
+      {/* Compact Clean Directory Footer */}
+      <footer className="mt-12 bg-[#090e0b] border-t border-[#304c3b] py-5 text-xs text-[#c2cbc5] font-mono">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Terminal className="w-4 h-4 text-[#38ff8e]" />
-            <span className="font-bold text-[#f8fffa] uppercase">FINETRACK // SYS_VERSION_2.0</span>
+            <span className="font-bold text-[#f8fffa] uppercase">FineTrack</span>
             <span className="text-[#304c3b]">|</span>
-            <span className="text-[11px] text-[#c2cbc5]">CYBERPUNK TELEMETRY INTERFACE</span>
+            <span className="text-[11px] text-[#c2cbc5]">Live Late Tracking & Fine Management</span>
           </div>
 
           <div className="flex items-center gap-3 text-[11px]">
-            <span>POSTGRESQL_RLS: <strong className="text-[#38ff8e]">ACTIVE</strong></span>
+            <span>Database: <strong className="text-[#38ff8e]">Supabase PostgreSQL</strong></span>
             <span className="text-[#304c3b]">/</span>
-            <span>LEVY: <strong className="text-[#ff65d8]">₹100.00 / DAY</strong></span>
+            <span>Rate: <strong className="text-[#38ff8e]">₹100 / Late Entry</strong></span>
             <span className="text-[#304c3b]">/</span>
             <button
               onClick={handleAdminAccess}
               className="text-[#38ff8e] hover:underline uppercase font-bold"
             >
-              [ADMIN_PORTAL]
+              [Admin Login]
             </button>
           </div>
         </div>
