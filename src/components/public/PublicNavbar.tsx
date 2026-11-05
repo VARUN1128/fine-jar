@@ -91,11 +91,6 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
 
           {/* Right Status & Admin CTA */}
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 bg-[#090e0b] border border-[#304c3b] text-[#38ff8e] text-[10px] font-mono uppercase">
-              <span className="w-1.5 h-1.5 bg-[#38ff8e] animate-ping" />
-              <span>Realtime Live</span>
-            </div>
-
             {isAdmin ? (
               <button
                 type="button"
