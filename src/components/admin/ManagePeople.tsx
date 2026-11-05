@@ -20,7 +20,6 @@ export const ManagePeople: React.FC = () => {
   const [markLatePersonId, setMarkLatePersonId] = useState<string | null>(null);
   const [loadingAction, setLoadingAction] = useState(false);
 
-  // Combine people with their summary stats
   const combinedPeopleList = useMemo(() => {
     return people
       .filter((p) => p.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -48,162 +47,156 @@ export const ManagePeople: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Top action bar */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+    <div className="space-y-4 font-mono">
+      {/* Header and Controls */}
+      <div className="bg-[#090e0b] p-4 sm:p-5 border border-[#304c3b] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">People Management</h2>
-          <p className="text-xs text-slate-500 font-medium">
-            Register, edit, deactivate, or delete team members and inspect their late stats
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-[#38ff8e]" />
+            <h2 className="font-display text-base font-bold uppercase text-[#f8fffa] tracking-wide">
+              MEMBERS_DIRECTORY_MANAGEMENT
+            </h2>
+          </div>
+          <p className="text-[10px] text-[#c2cbc5] uppercase mt-0.5">
+            IDENTITY REGISTRATION // ENTITY STATUS DEACTIVATION // PENALTY AUDITING
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#c2cbc5]" />
             <input
               type="text"
-              placeholder="Search by name..."
+              placeholder="SEARCH_NAME..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full sm:w-60 pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 text-slate-800"
+              className="w-full sm:w-56 pl-8 pr-3 py-1.5 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] outline-hidden"
             />
           </div>
 
           <button
             type="button"
             onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all shadow-sm"
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 text-xs font-mono font-bold uppercase text-[#020303] bg-[#38ff8e] border border-[#38ff8e] hover:bg-transparent hover:text-[#38ff8e] clip-corner-diagonal"
           >
-            <UserPlus className="w-4 h-4 text-emerald-400" />
-            <span>Add New Person</span>
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>REGISTER_MEMBER</span>
           </button>
         </div>
       </div>
 
       {/* People Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+      <div className="bg-[#090e0b] border border-[#304c3b]">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
-            <thead className="bg-slate-50/70 text-slate-500 font-semibold uppercase border-b border-slate-100">
+            <thead className="bg-[#020303] text-[#c2cbc5] font-bold uppercase text-[10px] border-b border-[#304c3b]">
               <tr>
-                <th className="py-3 px-6">Person</th>
-                <th className="py-3 px-6">Unique ID</th>
-                <th className="py-3 px-6 text-center">Status</th>
-                <th className="py-3 px-6 text-center">Late Days</th>
-                <th className="py-3 px-6">Cumulative Fine</th>
-                <th className="py-3 px-6 text-right">Actions</th>
+                <th className="py-2.5 px-4 border-r border-[#304c3b]">MEMBER_IDENTITY</th>
+                <th className="py-2.5 px-4 border-r border-[#304c3b]">SYSTEM_UUID</th>
+                <th className="py-2.5 px-4 text-center border-r border-[#304c3b]">STATUS</th>
+                <th className="py-2.5 px-4 text-center border-r border-[#304c3b]">LATE_DAYS</th>
+                <th className="py-2.5 px-4 border-r border-[#304c3b]">CUMULATIVE_LEVY</th>
+                <th className="py-2.5 px-4 text-right">CONTROLS</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
+            <tbody className="divide-y divide-[#304c3b] text-[#f8fffa]">
               {combinedPeopleList.length > 0 ? (
                 combinedPeopleList.map((person) => (
-                  <tr key={person.id} className="hover:bg-slate-50/80 transition-colors">
-                    {/* Person */}
-                    <td className="py-3.5 px-6 font-semibold text-slate-900 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs uppercase">
+                  <tr key={person.id} className="hover:bg-[#020303] transition-none">
+                    <td className="py-2.5 px-4 font-bold border-r border-[#304c3b] flex items-center gap-2.5">
+                      <div className="w-6 h-6 bg-[#020303] border border-[#304c3b] text-[#38ff8e] flex items-center justify-center text-[10px] font-bold uppercase">
                         {person.full_name.charAt(0)}
                       </div>
                       <div>
-                        <span className="font-bold text-slate-900">{person.full_name}</span>
-                        <div className="text-[10px] text-slate-400">
-                          Joined {formatDate(person.created_at)}
+                        <span className="font-bold text-[#f8fffa]">{person.full_name}</span>
+                        <div className="text-[9px] text-[#c2cbc5]">
+                          REGISTERED: {formatDate(person.created_at)}
                         </div>
                       </div>
                     </td>
 
-                    {/* ID */}
-                    <td className="py-3.5 px-6 font-mono text-[11px] text-slate-400">
+                    <td className="py-2.5 px-4 font-mono text-[10px] text-[#65f8ff] border-r border-[#304c3b]">
                       {person.id.slice(0, 8)}...
                     </td>
 
-                    {/* Status */}
-                    <td className="py-3.5 px-6 text-center">
+                    <td className="py-2.5 px-4 text-center border-r border-[#304c3b]">
                       {person.is_active ? (
                         <Badge variant="success" size="sm">
-                          Active
+                          ACTIVE
                         </Badge>
                       ) : (
                         <Badge variant="outline" size="sm">
-                          Inactive
+                          DEACTIVATED
                         </Badge>
                       )}
                     </td>
 
-                    {/* Late Days */}
-                    <td className="py-3.5 px-6 text-center">
+                    <td className="py-2.5 px-4 text-center border-r border-[#304c3b]">
                       {person.total_late_days > 0 ? (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200/50">
-                          {person.total_late_days} {person.total_late_days === 1 ? 'day' : 'days'}
+                        <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold bg-[#020303] text-[#ff65d8] border border-[#ff65d8]">
+                          {person.total_late_days} DAYS
                         </span>
                       ) : (
-                        <span className="text-slate-400">0</span>
+                        <span className="text-[#304c3b]">0</span>
                       )}
                     </td>
 
-                    {/* Cumulative Fine */}
-                    <td className="py-3.5 px-6 font-bold text-slate-900">
+                    <td className="py-2.5 px-4 font-bold text-[#38ff8e] border-r border-[#304c3b]">
                       {formatRupee(person.total_fine)}
                     </td>
 
-                    {/* Actions */}
-                    <td className="py-3.5 px-6 text-right">
-                      <div className="inline-flex items-center gap-1.5">
-                        {/* Quick Mark Late */}
+                    <td className="py-2.5 px-4 text-right">
+                      <div className="inline-flex items-center gap-1">
                         <button
                           type="button"
-                          title="Record Late for this person"
+                          title="Record late entry"
                           onClick={() => setMarkLatePersonId(person.id)}
-                          className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          className="p-1 border border-[#304c3b] text-[#38ff8e] hover:bg-[#38ff8e] hover:text-[#020303]"
                         >
-                          <PlusCircle className="w-4 h-4" />
+                          <PlusCircle className="w-3.5 h-3.5" />
                         </button>
 
-                        {/* View History */}
                         <button
                           type="button"
-                          title="View Attendance History"
+                          title="View history"
                           onClick={() => {
                             const summary = personSummaries.find((s) => s.person_id === person.id);
                             if (summary) setViewingHistoryPerson(summary);
                           }}
-                          className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                          className="p-1 border border-[#304c3b] text-[#65f8ff] hover:bg-[#65f8ff] hover:text-[#020303]"
                         >
-                          <History className="w-4 h-4" />
+                          <History className="w-3.5 h-3.5" />
                         </button>
 
-                        {/* Edit Name */}
                         <button
                           type="button"
-                          title="Edit Name"
+                          title="Edit member name"
                           onClick={() => setEditingPerson(person)}
-                          className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                          className="p-1 border border-[#304c3b] text-[#d3dbd5] hover:bg-[#d3dbd5] hover:text-[#020303]"
                         >
-                          <Edit3 className="w-4 h-4" />
+                          <Edit3 className="w-3.5 h-3.5" />
                         </button>
 
-                        {/* Toggle Active / Inactive */}
                         <button
                           type="button"
-                          title={person.is_active ? 'Deactivate Person' : 'Activate Person'}
+                          title={person.is_active ? 'Deactivate member' : 'Activate member'}
                           onClick={() => handleToggleActive(person)}
-                          className={`p-1.5 rounded-lg transition-colors ${
+                          className={`p-1 border ${
                             person.is_active
-                              ? 'text-amber-600 hover:bg-amber-50'
-                              : 'text-emerald-600 hover:bg-emerald-50'
+                              ? 'border-[#304c3b] text-[#c2cbc5] hover:text-[#ff65d8] hover:border-[#ff65d8]'
+                              : 'border-[#38ff8e] text-[#38ff8e] hover:bg-[#38ff8e] hover:text-[#020303]'
                           }`}
                         >
-                          <Power className="w-4 h-4" />
+                          <Power className="w-3.5 h-3.5" />
                         </button>
 
-                        {/* Delete Person */}
                         <button
                           type="button"
-                          title="Delete Person"
+                          title="Purge member record"
                           onClick={() => setDeletingPerson(person)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          className="p-1 border border-[#304c3b] text-[#ff65d8] hover:bg-[#ff65d8] hover:text-[#020303]"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </td>
@@ -211,8 +204,8 @@ export const ManagePeople: React.FC = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400 text-xs">
-                    No people found matching "{searchQuery}".
+                  <td colSpan={6} className="py-8 text-center text-[#c2cbc5] text-xs">
+                    [EMPTY_RECORD_SET] NO MEMBERS REGISTERED.
                   </td>
                 </tr>
               )}
@@ -221,7 +214,6 @@ export const ManagePeople: React.FC = () => {
         </div>
       </div>
 
-      {/* Add / Edit Person Modal */}
       <PersonModal
         isOpen={isAddModalOpen || Boolean(editingPerson)}
         personToEdit={editingPerson}
@@ -231,25 +223,22 @@ export const ManagePeople: React.FC = () => {
         }}
       />
 
-      {/* Quick Mark Late Modal for a specific person */}
       <MarkLateModal
         isOpen={Boolean(markLatePersonId)}
         onClose={() => setMarkLatePersonId(null)}
         defaultPersonId={markLatePersonId || undefined}
       />
 
-      {/* Confirmation Dialog for Deletion */}
       <ConfirmDialog
         isOpen={Boolean(deletingPerson)}
         onClose={() => setDeletingPerson(null)}
         onConfirm={handleConfirmDelete}
-        title="Delete Person"
-        message={`Are you sure you want to delete ${deletingPerson?.full_name}? This will also remove all associated late entries and recalculate cumulative fines.`}
-        confirmText="Confirm Delete"
+        title="PURGE_MEMBER_ENTITY"
+        message={`Confirm deletion of ${deletingPerson?.full_name}? All associated attendance records will cascade delete and recalculate totals.`}
+        confirmText="CONFIRM_PURGE"
         loading={loadingAction}
       />
 
-      {/* Complete Late History Modal */}
       <PersonHistoryModal
         isOpen={Boolean(viewingHistoryPerson)}
         person={viewingHistoryPerson}

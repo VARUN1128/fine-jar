@@ -7,7 +7,7 @@ interface StatCardProps {
   value: string | number;
   subtitle?: string;
   icon: LucideIcon;
-  variant?: 'default' | 'danger' | 'warning' | 'success' | 'indigo';
+  variant?: 'default' | 'danger' | 'warning' | 'success' | 'indigo' | 'lime' | 'orange';
   trend?: string;
   badge?: string;
 }
@@ -21,64 +21,58 @@ export const StatCard: React.FC<StatCardProps> = ({
   trend,
   badge,
 }) => {
-  const variantStyles = {
-    default: {
-      iconBg: 'bg-slate-100 text-slate-800',
-      border: 'border-slate-200/80',
-      glow: 'group-hover:border-slate-300',
-    },
-    danger: {
-      iconBg: 'bg-rose-50 text-rose-600',
-      border: 'border-rose-100',
-      glow: 'group-hover:border-rose-300',
-    },
-    warning: {
-      iconBg: 'bg-amber-50 text-amber-600',
-      border: 'border-amber-100',
-      glow: 'group-hover:border-amber-300',
-    },
-    success: {
-      iconBg: 'bg-emerald-50 text-emerald-600',
-      border: 'border-emerald-100',
-      glow: 'group-hover:border-emerald-300',
-    },
-    indigo: {
-      iconBg: 'bg-indigo-50 text-indigo-600',
-      border: 'border-indigo-100',
-      glow: 'group-hover:border-indigo-300',
-    },
+  const signalColors = {
+    default: 'text-[#38ff8e] border-[#304c3b] hover:border-[#38ff8e]',
+    danger: 'text-[#ff65d8] border-[#304c3b] hover:border-[#ff65d8]',
+    orange: 'text-[#ff65d8] border-[#304c3b] hover:border-[#ff65d8]',
+    warning: 'text-[#65f8ff] border-[#304c3b] hover:border-[#65f8ff]',
+    success: 'text-[#38ff8e] border-[#304c3b] hover:border-[#38ff8e]',
+    lime: 'text-[#38ff8e] border-[#304c3b] hover:border-[#38ff8e]',
+    indigo: 'text-[#65f8ff] border-[#304c3b] hover:border-[#65f8ff]',
   };
 
-  const style = variantStyles[variant];
+  const signalStyle = signalColors[variant] || signalColors.default;
 
   return (
     <div
       className={cn(
-        'group relative bg-white p-6 rounded-2xl border shadow-sm transition-all duration-200 hover:shadow-md',
-        style.border,
-        style.glow
+        'relative bg-[#090e0b] p-4 sm:p-5 border border-[#304c3b] group select-none font-mono transition-none',
+        signalStyle
       )}
     >
+      {/* Micro registration corner indicator */}
+      <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#65f8ff]/40 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#304c3b] pointer-events-none" />
+
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <p className="text-xs font-semibold tracking-wider text-slate-500 uppercase">{title}</p>
-          <div className="flex items-baseline gap-2">
-            <h4 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">{value}</h4>
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 bg-[#38ff8e]" />
+            <p className="text-[11px] font-mono font-semibold tracking-wider text-[#c2cbc5] uppercase">
+              {title}
+            </p>
+          </div>
+          <div className="flex items-baseline gap-2 pt-1">
+            <h4 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-[#f8fffa]">
+              {value}
+            </h4>
             {badge && (
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+              <span className="text-[10px] font-mono uppercase px-1.5 py-0.2 bg-[#020303] text-[#65f8ff] border border-[#304c3b]">
                 {badge}
               </span>
             )}
           </div>
-          {subtitle && <p className="text-xs text-slate-500 font-medium">{subtitle}</p>}
+          {subtitle && (
+            <p className="text-xs text-[#c2cbc5] font-mono pt-0.5">{subtitle}</p>
+          )}
           {trend && (
-            <p className="text-xs font-medium text-emerald-600 flex items-center gap-1 mt-1">
+            <p className="text-[11px] font-mono text-[#38ff8e] flex items-center gap-1 mt-1">
               {trend}
             </p>
           )}
         </div>
-        <div className={cn('p-3 rounded-xl transition-transform group-hover:scale-105', style.iconBg)}>
-          <Icon className="w-6 h-6" />
+        <div className="p-2 border border-[#304c3b] bg-[#020303] text-[#38ff8e] group-hover:border-[#38ff8e] group-hover:bg-[#38ff8e] group-hover:text-[#020303]">
+          <Icon className="w-4 h-4" />
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, Calendar, Download, RefreshCw, X } from 'lucide-react';
+import { Search, Filter, Download, X } from 'lucide-react';
 import { useFineTrack } from '@/context/FineTrackContext';
 import { formatDate, formatDuration, formatRupee, exportToCSV } from '@/lib/utils';
 import { Badge } from '@/components/common/Badge';
@@ -19,33 +19,24 @@ export const AllRecordsExplorer: React.FC<AllRecordsExplorerProps> = ({ onSelect
   const [endDate, setEndDate] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'duration_high' | 'duration_low'>('newest');
 
-  // Filter logic combining all filters correctly
   const filteredEntries = useMemo(() => {
     return entriesWithPerson.filter((entry) => {
-      // 1. Search name
       if (searchName.trim()) {
         const q = searchName.toLowerCase();
         if (!entry.person_name.toLowerCase().includes(q)) return false;
       }
-
-      // 2. Person dropdown
       if (selectedPersonId && entry.person_id !== selectedPersonId) {
         return false;
       }
-
-      // 3. Specific date
       if (specificDate && entry.late_date !== specificDate) {
         return false;
       }
-
-      // 4. Date range (start & end)
       if (startDate && entry.late_date < startDate) {
         return false;
       }
       if (endDate && entry.late_date > endDate) {
         return false;
       }
-
       return true;
     }).sort((a, b) => {
       if (sortBy === 'newest') return b.late_date.localeCompare(a.late_date);
@@ -83,75 +74,68 @@ export const AllRecordsExplorer: React.FC<AllRecordsExplorerProps> = ({ onSelect
       'Paid Status': e.is_paid ? 'Paid' : 'Unpaid',
       'Remarks': e.remarks || '',
     }));
-    exportToCSV(`FineTrack_Records_Export`, rows);
+    exportToCSV(`FineTrack_Cyberpunk_Matrix_Export`, rows);
   };
 
   return (
-    <div className="space-y-6">
-      {/* Filter Control Center */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+    <div className="space-y-4 font-mono">
+      {/* Filter Control Matrix */}
+      <div className="bg-[#090e0b] p-4 sm:p-5 border border-[#304c3b]">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 border-b border-[#304c3b] gap-2">
           <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-slate-100 text-slate-700">
-              <Filter className="w-4 h-4" />
-            </span>
-            <div>
-              <h3 className="text-base font-bold text-slate-900 tracking-tight">Records & Filter Engine</h3>
-              <p className="text-xs text-slate-500">
-                Filter by date, date range, person name, or duration with live sorting
-              </p>
-            </div>
+            <span className="w-1.5 h-1.5 bg-[#38ff8e]" />
+            <h3 className="font-display text-sm font-bold uppercase text-[#f8fffa] tracking-wider">
+              RECORDS_FILTER_ENGINE
+            </h3>
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-auto">
+          <div className="flex items-center gap-2">
             {hasActiveFilters && (
               <button
                 type="button"
                 onClick={resetFilters}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors"
+                className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-bold text-[#ff65d8] border border-[#ff65d8] hover:bg-[#ff65d8] hover:text-[#020303] uppercase"
               >
-                <X className="w-3.5 h-3.5" />
-                <span>Reset Filters</span>
+                <X className="w-3 h-3" />
+                <span>RESET_FILTERS</span>
               </button>
             )}
             <button
               type="button"
               onClick={handleExportCSV}
               disabled={filteredEntries.length === 0}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-50 rounded-lg transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold text-[#38ff8e] bg-[#020303] border border-[#304c3b] hover:border-[#38ff8e] disabled:opacity-40 uppercase"
             >
-              <Download className="w-3.5 h-3.5 text-slate-500" />
-              <span>Export CSV</span>
+              <Download className="w-3 h-3 text-[#38ff8e]" />
+              <span>EXPORT_CSV</span>
             </button>
           </div>
         </div>
 
-        {/* Filter Inputs Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-          {/* Search by Name */}
+        {/* Inputs Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Search Name</label>
+            <label className="block text-[10px] font-bold text-[#c2cbc5] uppercase mb-1">NAME_QUERY</label>
             <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-3 h-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#c2cbc5]" />
               <input
                 type="text"
-                placeholder="e.g. Rahul"
+                placeholder="SEARCH_MEMBER..."
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
+                className="w-full pl-7 pr-2 py-1 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] outline-hidden"
               />
             </div>
           </div>
 
-          {/* Person Dropdown */}
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Select Person</label>
+            <label className="block text-[10px] font-bold text-[#c2cbc5] uppercase mb-1">MEMBER_IDENTITY</label>
             <select
               value={selectedPersonId}
               onChange={(e) => setSelectedPersonId(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 text-slate-800 cursor-pointer"
+              className="w-full px-2 py-1 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] outline-hidden"
             >
-              <option value="">All People</option>
+              <option value="">ALL_MEMBERS</option>
               {people.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.full_name}
@@ -160,9 +144,8 @@ export const AllRecordsExplorer: React.FC<AllRecordsExplorerProps> = ({ onSelect
             </select>
           </div>
 
-          {/* Specific Date */}
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Specific Date</label>
+            <label className="block text-[10px] font-bold text-[#c2cbc5] uppercase mb-1">DATE_MATCH</label>
             <input
               type="date"
               value={specificDate}
@@ -173,30 +156,29 @@ export const AllRecordsExplorer: React.FC<AllRecordsExplorerProps> = ({ onSelect
                   setEndDate('');
                 }
               }}
-              className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 cursor-pointer"
+              className="w-full px-2 py-1 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] outline-hidden cursor-pointer"
             />
           </div>
 
-          {/* Sort By */}
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Sort By</label>
+            <label className="block text-[10px] font-bold text-[#c2cbc5] uppercase mb-1">ORDER_SEQUENCE</label>
             <select
               value={sortBy}
               onChange={(e: any) => setSortBy(e.target.value)}
-              className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 text-slate-800 cursor-pointer"
+              className="w-full px-2 py-1 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] outline-hidden"
             >
-              <option value="newest">Date: Newest First</option>
-              <option value="oldest">Date: Oldest First</option>
-              <option value="duration_high">Duration: Highest</option>
-              <option value="duration_low">Duration: Lowest</option>
+              <option value="newest">DATE_DESCENDING (NEWEST)</option>
+              <option value="oldest">DATE_ASCENDING (OLDEST)</option>
+              <option value="duration_high">DURATION_DESCENDING (MAX)</option>
+              <option value="duration_low">DURATION_ASCENDING (MIN)</option>
             </select>
           </div>
         </div>
 
-        {/* Date Range Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3 pt-3 border-t border-slate-100">
+        {/* Date Range Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#304c3b]">
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Range: From Date</label>
+            <label className="block text-[10px] font-bold text-[#c2cbc5] uppercase mb-1">RANGE_START_DATE</label>
             <input
               type="date"
               value={startDate}
@@ -204,11 +186,11 @@ export const AllRecordsExplorer: React.FC<AllRecordsExplorerProps> = ({ onSelect
                 setStartDate(e.target.value);
                 if (e.target.value) setSpecificDate('');
               }}
-              className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 cursor-pointer"
+              className="w-full px-2 py-1 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] outline-hidden cursor-pointer"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Range: To Date</label>
+            <label className="block text-[10px] font-bold text-[#c2cbc5] uppercase mb-1">RANGE_END_DATE</label>
             <input
               type="date"
               value={endDate}
@@ -216,83 +198,79 @@ export const AllRecordsExplorer: React.FC<AllRecordsExplorerProps> = ({ onSelect
                 setEndDate(e.target.value);
                 if (e.target.value) setSpecificDate('');
               }}
-              className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 cursor-pointer"
+              className="w-full px-2 py-1 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] outline-hidden cursor-pointer"
             />
           </div>
         </div>
       </div>
 
       {/* Results Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-        <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-[#090e0b] border border-[#304c3b]">
+        <div className="p-3 border-b border-[#304c3b] flex items-center justify-between bg-[#020303]/50">
           <div className="flex items-center gap-2">
-            <h4 className="text-sm font-bold text-slate-900">
-              Matching Records
+            <h4 className="font-display text-xs font-bold uppercase text-[#f8fffa]">
+              FILTERED_RECORD_SET
             </h4>
             <Badge variant="default" size="sm">
-              {filteredEntries.length} found
+              {filteredEntries.length} MATCHES
             </Badge>
           </div>
-          <span className="text-xs text-slate-500">
-            Total Fine in selection: <strong className="text-slate-900">{formatRupee(filteredEntries.length * 100)}</strong>
+          <span className="text-[10px] text-[#c2cbc5] uppercase">
+            SUM_FINE: <strong className="text-[#38ff8e]">{formatRupee(filteredEntries.length * 100)}</strong>
           </span>
         </div>
 
         {filteredEntries.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
-              <thead className="bg-slate-50/70 text-slate-500 font-semibold uppercase border-b border-slate-100">
+              <thead className="bg-[#020303] text-[#c2cbc5] font-bold uppercase text-[10px] border-b border-[#304c3b]">
                 <tr>
-                  <th className="py-3 px-6">Person</th>
-                  <th className="py-3 px-6">Date</th>
-                  <th className="py-3 px-6">Late Duration</th>
-                  <th className="py-3 px-6">Fine</th>
-                  <th className="py-3 px-6">Remarks</th>
-                  <th className="py-3 px-6 text-right">Action</th>
+                  <th className="py-2.5 px-3 border-r border-[#304c3b]">MEMBER</th>
+                  <th className="py-2.5 px-3 border-r border-[#304c3b]">CALENDAR_DATE</th>
+                  <th className="py-2.5 px-3 border-r border-[#304c3b]">DELAY_RECORD</th>
+                  <th className="py-2.5 px-3 border-r border-[#304c3b]">LEVY</th>
+                  <th className="py-2.5 px-3 border-r border-[#304c3b]">REMARKS</th>
+                  <th className="py-2.5 px-3 text-right">ACTION</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700">
+              <tbody className="divide-y divide-[#304c3b] text-[#f8fffa]">
                 {filteredEntries.map((entry) => (
                   <tr
                     key={entry.id}
-                    className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                    className="hover:bg-[#020303] transition-none cursor-pointer group"
                     onClick={() => {
                       const p = personSummaries.find((x) => x.person_id === entry.person_id);
                       if (p) onSelectPerson(p);
                     }}
                   >
-                    <td className="py-3.5 px-6 font-semibold text-slate-900 flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-full bg-slate-100 text-slate-700 group-hover:bg-rose-100 group-hover:text-rose-700 flex items-center justify-center font-bold text-[11px] uppercase transition-colors">
+                    <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] flex items-center gap-2">
+                      <div className="w-5 h-5 bg-[#020303] border border-[#304c3b] group-hover:border-[#38ff8e] text-[#38ff8e] flex items-center justify-center font-bold text-[9px] uppercase">
                         {entry.person_name.charAt(0)}
                       </div>
-                      <span className="group-hover:text-rose-600 transition-colors">
+                      <span className="group-hover:text-[#38ff8e]">
                         {entry.person_name}
                       </span>
                     </td>
 
-                    <td className="py-3.5 px-6 font-medium text-slate-700 whitespace-nowrap">
+                    <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap text-[#d3dbd5]">
                       {formatDate(entry.late_date)}
                     </td>
 
-                    <td className="py-3.5 px-6 whitespace-nowrap">
-                      <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200/50 font-medium">
-                        {formatDuration(entry.late_hours, entry.late_minutes)}
-                      </span>
+                    <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap text-[#ff65d8] font-bold">
+                      +{formatDuration(entry.late_hours, entry.late_minutes)}
                     </td>
 
-                    <td className="py-3.5 px-6 font-bold text-slate-900 whitespace-nowrap">
-                      <Badge variant="danger" size="sm">
-                        ₹100
-                      </Badge>
+                    <td className="py-2.5 px-3 font-bold text-[#38ff8e] border-r border-[#304c3b] whitespace-nowrap">
+                      ₹100.00
                     </td>
 
-                    <td className="py-3.5 px-6 text-slate-500 max-w-xs truncate">
-                      {entry.remarks || <span className="text-slate-300 italic">None</span>}
+                    <td className="py-2.5 px-3 text-[#c2cbc5] max-w-xs truncate border-r border-[#304c3b]">
+                      {entry.remarks || <span className="text-[#304c3b]">[NULL]</span>}
                     </td>
 
-                    <td className="py-3.5 px-6 text-right">
-                      <span className="text-[11px] font-semibold text-slate-500 group-hover:text-slate-900 underline">
-                        View History
+                    <td className="py-2.5 px-3 text-right">
+                      <span className="text-[10px] font-bold text-[#38ff8e] group-hover:underline uppercase">
+                        INSPECT
                       </span>
                     </td>
                   </tr>
@@ -301,8 +279,8 @@ export const AllRecordsExplorer: React.FC<AllRecordsExplorerProps> = ({ onSelect
             </table>
           </div>
         ) : (
-          <div className="py-12 text-center text-slate-400 text-xs">
-            No late entries match your selected criteria.
+          <div className="py-8 text-center text-[#c2cbc5] text-xs">
+            [NULL_MATCH] NO LATE ENTRIES MATCH FILTER CRITERIA.
           </div>
         )}
       </div>

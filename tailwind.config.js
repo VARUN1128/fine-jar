@@ -7,49 +7,38 @@ export default {
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+        border: "var(--dp-color-line)",
+        input: "var(--dp-color-line)",
+        ring: "var(--dp-color-accent)",
+        background: "var(--dp-color-ground)",
+        foreground: "var(--dp-color-ink)",
+        cyber: {
+          ground: "#020303",
+          plate: "#090e0b",
+          line: "#304c3b",
+          control: "#659579",
+          accent: "#38ff8e",
+          cyan: "#65f8ff",
+          magenta: "#ff65d8",
+          ink: "#f8fffa",
+          body: "#d3dbd5",
+          muted: "#c2cbc5",
         },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-        navy: {
-          900: "#0F172A",
-          800: "#1E293B",
-          700: "#334155",
-        }
+      },
+      fontFamily: {
+        display: ['"Cyberpunk Plex Sans"', '"IBM Plex Sans"', 'sans-serif'],
+        mono: ['"Cyberpunk Plex Mono"', '"IBM Plex Mono"', 'monospace'],
+        sans: ['"Cyberpunk Plex Sans"', '"IBM Plex Sans"', 'sans-serif'],
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        DEFAULT: '0px',
+        none: '0px',
+        sm: '0px',
+        md: '0px',
+        lg: '0px',
+        xl: '0px',
+        '2xl': '0px',
+        '3xl': '0px',
       },
     },
   },

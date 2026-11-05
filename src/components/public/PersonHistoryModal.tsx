@@ -21,7 +21,6 @@ export const PersonHistoryModal: React.FC<PersonHistoryModalProps> = ({
 
   if (!person) return null;
 
-  // Filter and sort entries for this person (newest first)
   const historyEntries: LateEntry[] = lateEntries
     .filter((e) => e.person_id === person.person_id)
     .sort((a, b) => b.late_date.localeCompare(a.late_date));
@@ -43,112 +42,106 @@ export const PersonHistoryModal: React.FC<PersonHistoryModalProps> = ({
       'Paid Status': e.is_paid ? 'Paid' : 'Unpaid',
       'Remarks': e.remarks || '',
     }));
-    exportToCSV(`FineTrack_${person.full_name.replace(/\s+/g, '_')}_History`, rows);
+    exportToCSV(`FineTrack_Dossier_${person.full_name.replace(/\s+/g, '_')}`, rows);
   };
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Late Attendance History: ${person.full_name}`}
-      description="Detailed historical record of all late days, durations, and accumulated fines."
+      title={`DOSSIER // ${person.full_name}`}
+      description="Historical tardiness infractions, duration logs, and cumulative penalty calculation."
       maxWidth="2xl"
     >
-      <div className="space-y-6">
-        {/* Quick summary stats banner */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-slate-50/80 rounded-2xl border border-slate-100">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-rose-100 text-rose-700 rounded-xl">
-              <Calendar className="w-4 h-4" />
+      <div className="space-y-4 font-mono">
+        {/* Facts Banner */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-3 bg-[#020303] border border-[#304c3b]">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-[#090e0b] border border-[#304c3b] text-[#38ff8e]">
+              <Calendar className="w-3.5 h-3.5" />
             </div>
             <div>
-              <span className="text-[11px] text-slate-500 font-medium">Total Late Days</span>
-              <p className="text-base font-bold text-slate-900">{person.total_late_days}</p>
+              <span className="text-[10px] text-[#c2cbc5] uppercase block">TOTAL_LATE_DAYS</span>
+              <p className="text-sm font-bold text-[#f8fffa]">{person.total_late_days}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-amber-100 text-amber-700 rounded-xl">
-              <IndianRupee className="w-4 h-4" />
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-[#090e0b] border border-[#304c3b] text-[#ff65d8]">
+              <IndianRupee className="w-3.5 h-3.5" />
             </div>
             <div>
-              <span className="text-[11px] text-slate-500 font-medium">Accumulated Fine</span>
-              <p className="text-base font-bold text-slate-900">{formatRupee(person.total_fine)}</p>
+              <span className="text-[10px] text-[#c2cbc5] uppercase block">TOTAL_PENALTY</span>
+              <p className="text-sm font-bold text-[#ff65d8]">{formatRupee(person.total_fine)}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-sky-100 text-sky-700 rounded-xl">
-              <Clock className="w-4 h-4" />
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-[#090e0b] border border-[#304c3b] text-[#65f8ff]">
+              <Clock className="w-3.5 h-3.5" />
             </div>
             <div>
-              <span className="text-[11px] text-slate-500 font-medium">Total Late Time</span>
-              <p className="text-base font-bold text-slate-900">
+              <span className="text-[10px] text-[#c2cbc5] uppercase block">DELAY_TIME_SUM</span>
+              <p className="text-sm font-bold text-[#65f8ff]">
                 {formatDuration(Math.floor(totalMinutes / 60), totalMinutes % 60)}
               </p>
             </div>
           </div>
         </div>
 
-        {/* History Table or Empty State */}
+        {/* History Table */}
         {historyEntries.length > 0 ? (
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                Recorded Entries ({historyEntries.length})
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-[11px] font-bold text-[#f8fffa] uppercase tracking-wider">
+                LOGGED_EVENTS ({historyEntries.length})
               </h4>
               <button
                 type="button"
                 onClick={handleExportCSV}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold text-[#38ff8e] bg-[#020303] border border-[#304c3b] hover:border-[#38ff8e] uppercase"
               >
-                <Download className="w-3.5 h-3.5 text-slate-500" />
-                <span>Export CSV</span>
+                <Download className="w-3 h-3 text-[#38ff8e]" />
+                <span>EXPORT_CSV</span>
               </button>
             </div>
 
-            <div className="overflow-x-auto max-h-80 border border-slate-200/80 rounded-xl">
+            <div className="overflow-x-auto max-h-72 border border-[#304c3b]">
               <table className="w-full text-left border-collapse text-xs">
-                <thead className="sticky top-0 bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-200">
+                <thead className="sticky top-0 bg-[#020303] text-[#c2cbc5] uppercase font-bold text-[10px] border-b border-[#304c3b]">
                   <tr>
-                    <th className="py-2.5 px-4">Date</th>
-                    <th className="py-2.5 px-4">Duration</th>
-                    <th className="py-2.5 px-4">Fine</th>
-                    <th className="py-2.5 px-4">Status</th>
-                    <th className="py-2.5 px-4">Remarks</th>
+                    <th className="py-2 px-3 border-r border-[#304c3b]">EVENT_DATE</th>
+                    <th className="py-2 px-3 border-r border-[#304c3b]">OFFSET</th>
+                    <th className="py-2 px-3 border-r border-[#304c3b]">LEVY</th>
+                    <th className="py-2 px-3 border-r border-[#304c3b]">STATUS</th>
+                    <th className="py-2 px-3">NOTES</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-700">
+                <tbody className="divide-y divide-[#304c3b] text-[#f8fffa] text-xs">
                   {historyEntries.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-slate-50/70">
-                      <td className="py-3 px-4 font-semibold text-slate-900 whitespace-nowrap">
+                    <tr key={entry.id} className="hover:bg-[#020303]">
+                      <td className="py-2 px-3 font-bold border-r border-[#304c3b] whitespace-nowrap">
                         {formatDate(entry.late_date)}
                       </td>
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200/40 font-medium">
-                          {formatDuration(entry.late_hours, entry.late_minutes)}
-                        </span>
+                      <td className="py-2 px-3 border-r border-[#304c3b] whitespace-nowrap text-[#ff65d8]">
+                        +{formatDuration(entry.late_hours, entry.late_minutes)}
                       </td>
-                      <td className="py-3 px-4 font-bold text-slate-900 whitespace-nowrap">
-                        <Badge variant="danger" size="sm">
-                          {formatRupee(entry.fine_amount || 100)}
-                        </Badge>
+                      <td className="py-2 px-3 font-bold text-[#38ff8e] border-r border-[#304c3b] whitespace-nowrap">
+                        ₹100.00
                       </td>
-                      <td className="py-3 px-4 whitespace-nowrap">
+                      <td className="py-2 px-3 border-r border-[#304c3b] whitespace-nowrap">
                         {entry.is_paid ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
-                            <CheckCircle className="w-3 h-3 text-emerald-500" />
-                            Paid
+                          <span className="text-[10px] text-[#38ff8e] uppercase font-bold">
+                            COLLECTED
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-rose-700 bg-rose-50 border border-rose-200/60 px-2 py-0.5 rounded-full">
-                            <AlertCircle className="w-3 h-3 text-rose-500" />
-                            Unpaid
+                          <span className="text-[10px] text-[#ff65d8] uppercase font-bold">
+                            PENDING
                           </span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-slate-500 max-w-xs truncate">
-                        {entry.remarks || <span className="text-slate-300 italic">None</span>}
+                      <td className="py-2 px-3 text-[#c2cbc5] max-w-xs truncate">
+                        {entry.remarks || <span className="text-[#304c3b]">[NULL]</span>}
                       </td>
                     </tr>
                   ))}
@@ -157,10 +150,10 @@ export const PersonHistoryModal: React.FC<PersonHistoryModalProps> = ({
             </div>
           </div>
         ) : (
-          <div className="py-8 text-center text-slate-400 text-sm">
-            <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
-            <p className="font-semibold text-slate-800">Spotless Attendance!</p>
-            <p className="text-xs text-slate-500 mt-1">This person has no recorded late days.</p>
+          <div className="py-6 text-center text-[#c2cbc5] text-xs bg-[#020303] border border-[#304c3b]">
+            <CheckCircle className="w-6 h-6 text-[#38ff8e] mx-auto mb-1.5" />
+            <p className="font-bold text-[#f8fffa] uppercase">DISCIPLINE RECORD UNBLEMISHED</p>
+            <p className="text-[11px] text-[#c2cbc5] mt-0.5">Zero tardiness events logged for this identity.</p>
           </div>
         )}
 
@@ -168,9 +161,9 @@ export const PersonHistoryModal: React.FC<PersonHistoryModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+            className="px-3.5 py-1 text-xs font-mono font-bold uppercase text-[#d3dbd5] bg-transparent border border-[#304c3b] hover:bg-[#304c3b]"
           >
-            Close
+            DISMISS
           </button>
         </div>
       </div>

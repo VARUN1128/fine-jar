@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Database, CheckCircle2, Copy, Check, Terminal, ExternalLink, ShieldAlert } from 'lucide-react';
+import { Database, CheckCircle2, Copy, Check, Terminal, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useFineTrack } from '@/context/FineTrackContext';
 import { Modal } from './Modal';
@@ -22,37 +22,39 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOi...`;
 
   return (
     <>
-      <div className="bg-slate-900 text-slate-200 text-xs py-2 px-4 border-b border-slate-800">
+      <div className="bg-[#020303] text-[#d3dbd5] text-xs py-2 px-4 border-b border-[#304c3b] font-mono">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-semibold text-white">FineTrack Live</span>
-            <span className="text-slate-400">|</span>
-            <span className="text-slate-300">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2 h-2 bg-[#38ff8e] animate-pulse" />
+            <span className="font-bold text-[#f8fffa] uppercase text-[11px] tracking-wider">
+              SYS.FINETRACK // SIGNAL_ACTIVE
+            </span>
+            <span className="text-[#304c3b]">|</span>
+            <span className="text-[#c2cbc5] text-[11px]">
               {isSupabaseConfigured ? (
-                <span className="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  Supabase Database & Realtime Connected
+                <span className="inline-flex items-center gap-1.5 text-[#38ff8e]">
+                  <CheckCircle2 className="w-3 h-3" />
+                  POSTGRES_REALTIME: LOCKED
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 text-amber-300 font-medium">
-                  <Database className="w-3.5 h-3.5" />
-                  Interactive Test Mode (Full CRUD & duplicate checks enabled)
+                <span className="inline-flex items-center gap-1.5 text-[#65f8ff]">
+                  <Database className="w-3 h-3" />
+                  STATE: LOCAL_SANDBOX_PROTOCOL
                 </span>
               )}
             </span>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="hidden sm:inline text-slate-400">
-              Admin Login: <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-200">fine@gmail.com</code> / <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-200">fine@sof.admn</code>
+            <span className="hidden sm:inline text-[#c2cbc5] text-[11px]">
+              ADMIN: <code className="bg-[#090e0b] px-1.5 py-0.5 border border-[#304c3b] text-[#f8fffa]">fine@gmail.com</code> / <code className="bg-[#090e0b] px-1.5 py-0.5 border border-[#304c3b] text-[#38ff8e]">fine@sof.admn</code>
             </span>
             <button
               onClick={() => setShowGuideModal(true)}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+              className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#090e0b] hover:bg-[#38ff8e] text-[#c2cbc5] hover:text-[#020303] border border-[#304c3b] hover:border-[#38ff8e] uppercase text-[10px] font-bold"
             >
-              <Terminal className="w-3 h-3 text-sky-400" />
-              <span>Supabase Setup SQL</span>
+              <Terminal className="w-3 h-3 text-[#38ff8e] group-hover:text-[#020303]" />
+              <span>SQL_SCHEMA</span>
             </button>
           </div>
         </div>
@@ -61,49 +63,48 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOi...`;
       <Modal
         isOpen={showGuideModal}
         onClose={() => setShowGuideModal(false)}
-        title="Supabase Database & Auth Setup"
-        description="Follow these steps to connect your own Supabase project in 2 minutes."
+        title="DATABASE_ARCHITECTURE_SETUP"
+        description="Run Supabase DDL schema with database-level Row Level Security and Realtime publication."
         maxWidth="lg"
       >
-        <div className="space-y-4 text-sm text-slate-600">
-          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs font-mono">
-            <div className="flex justify-between items-center mb-1 text-slate-400">
-              <span>Environment Variables (.env.local)</span>
+        <div className="space-y-4 text-xs font-mono text-[#d3dbd5]">
+          <div className="p-3 bg-[#020303] border border-[#304c3b]">
+            <div className="flex justify-between items-center mb-1 text-[#c2cbc5]">
+              <span>ENV_SPECIFICATION (.env.local)</span>
               <button
                 onClick={copyEnv}
-                className="flex items-center gap-1 text-sky-600 hover:text-sky-700 font-sans"
+                className="flex items-center gap-1 text-[#38ff8e] hover:text-[#65f8ff] uppercase font-bold"
               >
-                {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                {copied ? 'Copied' : 'Copy'}
+                {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                {copied ? 'COPIED' : 'COPY'}
               </button>
             </div>
-            <pre className="text-slate-800 overflow-x-auto whitespace-pre">{envSample}</pre>
+            <pre className="text-[#38ff8e] overflow-x-auto whitespace-pre">{envSample}</pre>
           </div>
 
           <div className="space-y-2">
-            <h5 className="font-semibold text-slate-900 text-sm">Quick Setup Steps:</h5>
-            <ol className="list-decimal list-inside space-y-1.5 text-slate-600 text-xs leading-relaxed">
+            <h5 className="font-display font-bold text-[#f8fffa] uppercase tracking-wide">Deployment Pipeline:</h5>
+            <ol className="list-decimal list-inside space-y-1.5 text-[#c2cbc5] leading-relaxed">
               <li>
-                Create a project at <a href="https://supabase.com" target="_blank" rel="noreferrer" className="text-sky-600 underline inline-flex items-center gap-0.5">supabase.com <ExternalLink className="w-2.5 h-2.5" /></a>.
+                Initialize project instance at <a href="https://supabase.com" target="_blank" rel="noreferrer" className="text-[#65f8ff] underline inline-flex items-center gap-0.5">supabase.com <ExternalLink className="w-2.5 h-2.5" /></a>.
               </li>
               <li>
-                Open the Supabase <strong>SQL Editor</strong> and run the contents of <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-800">supabase/schema.sql</code>.
+                Execute DDL from <code className="bg-[#020303] px-1 py-0.5 border border-[#304c3b] text-[#38ff8e]">supabase/schema.sql</code> inside the SQL editor.
               </li>
               <li>
-                Go to <strong>Authentication &gt; Users &gt; Add User</strong> with:
-                <br />Email: <code className="text-slate-900 font-semibold">fine@gmail.com</code>
-                <br />Password: <code className="text-slate-900 font-semibold">fine@sof.admn</code>
-                <br />(Or run <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-800">supabase/admin_setup.sql</code> in SQL Editor).
+                Register administrative user via <code className="bg-[#020303] px-1 py-0.5 border border-[#304c3b] text-[#38ff8e]">supabase/admin_setup.sql</code>:
+                <br /><span className="text-[#f8fffa]">EMAIL: fine@gmail.com</span>
+                <br /><span className="text-[#f8fffa]">PASSWORD: fine@sof.admn</span>
               </li>
               <li>
-                In Supabase <strong>Project Settings &gt; API</strong>, copy the Project URL and anon key into <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-800">.env.local</code>.
+                Assign API keys into <code className="bg-[#020303] px-1 py-0.5 border border-[#304c3b] text-[#38ff8e]">.env.local</code>.
               </li>
             </ol>
           </div>
 
-          <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-            <span>RLS policies and Supabase Realtime publication are already bundled in the schema!</span>
+          <div className="flex items-center gap-2 p-2.5 bg-[#020303] border border-[#38ff8e] text-[#38ff8e]">
+            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+            <span>PostgreSQL RLS and Realtime publications compiled with 0 mock data.</span>
           </div>
         </div>
       </Modal>

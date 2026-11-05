@@ -40,7 +40,7 @@ export const PersonModal: React.FC<PersonModalProps> = ({
     setSuccessMsg('');
 
     if (!fullName.trim()) {
-      setErrorMsg('Full name cannot be empty.');
+      setErrorMsg('IDENTIFIER_CANNOT_BE_BLANK');
       return;
     }
 
@@ -50,20 +50,20 @@ export const PersonModal: React.FC<PersonModalProps> = ({
       const res = await updatePerson(personToEdit.id, fullName, isActive);
       setLoading(false);
       if (res.success) {
-        setSuccessMsg('Person updated successfully!');
+        setSuccessMsg('ENTITY_UPDATED_SUCCESSFULLY');
         setTimeout(() => onClose(), 800);
       } else {
-        setErrorMsg(res.error || 'Failed to update person.');
+        setErrorMsg(res.error || 'UPDATE_OPERATION_FAILED');
       }
     } else {
       const res = await addPerson(fullName);
       setLoading(false);
       if (res.success) {
-        setSuccessMsg('Person added successfully!');
+        setSuccessMsg('MEMBER_REGISTERED_SUCCESSFULLY');
         setFullName('');
         setTimeout(() => onClose(), 800);
       } else {
-        setErrorMsg(res.error || 'Failed to add person.');
+        setErrorMsg(res.error || 'REGISTRATION_OPERATION_FAILED');
       }
     }
   };
@@ -72,75 +72,75 @@ export const PersonModal: React.FC<PersonModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={personToEdit ? 'Edit Person Details' : 'Add New Person'}
-      description="Register people to track attendance and fine records."
+      title={personToEdit ? 'MODIFY_MEMBER_ENTITY' : 'REGISTER_MEMBER_ENTITY'}
+      description="Register identity into PostgreSQL tracking database."
       maxWidth="sm"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 font-mono">
         {errorMsg && (
-          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
-            <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
-            <span className="font-semibold">{errorMsg}</span>
+          <div className="flex items-start gap-2 p-2.5 bg-[#020303] border border-[#ff65d8] text-[#ff65d8] text-xs">
+            <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+            <span className="font-bold">{errorMsg}</span>
           </div>
         )}
 
         {successMsg && (
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-            <span className="font-semibold">{successMsg}</span>
+          <div className="flex items-center gap-2 p-2.5 bg-[#020303] border border-[#38ff8e] text-[#38ff8e] text-xs">
+            <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="font-bold">{successMsg}</span>
           </div>
         )}
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
-            Full Name <span className="text-rose-500">*</span>
+          <label className="block text-[10px] font-bold text-[#c2cbc5] uppercase mb-1">
+            FULL_LEGAL_NAME <span className="text-[#ff65d8]">*</span>
           </label>
           <div className="relative">
-            <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <User className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#c2cbc5]" />
             <input
               type="text"
               required
               placeholder="e.g. Rahul Sharma"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 text-slate-900 font-medium"
+              className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] font-mono outline-hidden"
             />
           </div>
         </div>
 
         {personToEdit && (
           <div className="pt-1">
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex items-center gap-2 cursor-pointer text-xs text-[#d3dbd5]">
               <input
                 type="checkbox"
                 checked={isActive}
                 onChange={(e) => setIsActive(e.target.checked)}
-                className="w-4 h-4 text-slate-900 rounded border-slate-300 focus:ring-slate-900"
+                className="w-3.5 h-3.5 text-[#38ff8e] bg-[#020303] border border-[#304c3b] rounded-none focus:ring-[#38ff8e]"
               />
-              <span className="text-xs font-medium text-slate-700">
-                Active Member (Uncheck to deactivate)
+              <span className="uppercase text-[11px] font-bold">
+                ENTITY_ACTIVE_STATUS
               </span>
             </label>
           </div>
         )}
 
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#304c3b]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+            className="px-3 py-1.5 text-xs font-mono font-bold uppercase text-[#c2cbc5] bg-transparent border border-[#304c3b] hover:bg-[#304c3b]"
           >
-            Cancel
+            CANCEL
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 disabled:opacity-50 rounded-xl transition-all shadow-sm"
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-mono font-bold uppercase text-[#020303] bg-[#38ff8e] border border-[#38ff8e] hover:bg-transparent hover:text-[#38ff8e] disabled:opacity-40 clip-corner-diagonal"
           >
             {loading ? (
-              <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="w-3 h-3 border-2 border-[#020303] border-t-transparent animate-spin" />
             ) : null}
-            <span>{personToEdit ? 'Save Changes' : 'Add Person'}</span>
+            <span>{personToEdit ? 'SAVE_CHANGES' : 'COMMIT_REGISTRATION'}</span>
           </button>
         </div>
       </form>

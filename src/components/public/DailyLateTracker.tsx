@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Clock, Users, IndianRupee, Timer, CheckCircle, Search } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Clock, Users, IndianRupee, Timer, CheckCircle } from 'lucide-react';
 import { useFineTrack } from '@/context/FineTrackContext';
 import { formatDate, formatDuration, formatRupee, getTodayDateString } from '@/lib/utils';
 import { Badge } from '@/components/common/Badge';
@@ -13,12 +13,10 @@ interface DailyLateTrackerProps {
 export const DailyLateTracker: React.FC<DailyLateTrackerProps> = ({ onSelectPerson }) => {
   const { entriesWithPerson, personSummaries } = useFineTrack();
 
-  // Selected date defaults to today or the latest recorded date if today has none
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     return getTodayDateString();
   });
 
-  // Shift date helper (-1 or +1 day)
   const shiftDate = (deltaDays: number) => {
     const parts = selectedDate.split('-');
     const cur = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
@@ -33,12 +31,10 @@ export const DailyLateTracker: React.FC<DailyLateTrackerProps> = ({ onSelectPers
     setSelectedDate(getTodayDateString());
   };
 
-  // Filter entries for selectedDate
   const dayEntries = useMemo(() => {
     return entriesWithPerson.filter((entry) => entry.late_date === selectedDate);
   }, [entriesWithPerson, selectedDate]);
 
-  // Daily statistics
   const totalPeopleLate = dayEntries.length;
   const totalFineGenerated = dayEntries.reduce((sum, e) => sum + (e.fine_amount || 100), 0);
   const totalMinutes = dayEntries.reduce(
@@ -55,41 +51,44 @@ export const DailyLateTracker: React.FC<DailyLateTrackerProps> = ({ onSelectPers
   };
 
   return (
-    <div className="space-y-6">
-      {/* Date Selector Header Card */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="p-2 rounded-xl bg-rose-50 text-rose-600">
-                <Calendar className="w-5 h-5" />
-              </span>
-              <div>
-                <h2 className="text-xl font-bold text-slate-900 tracking-tight">Daily Late Tracker</h2>
-                <p className="text-xs text-slate-500 font-medium">
-                  Track everyone who arrived late on a specific date
-                </p>
+    <div className="space-y-4 font-mono">
+      {/* Date Selector Header Plate */}
+      <div className="bg-[#090e0b] p-4 sm:p-6 border border-[#304c3b]">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-[#020303] border border-[#38ff8e] flex items-center justify-center text-[#38ff8e]">
+              <Calendar className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-[#38ff8e]" />
+                <h2 className="font-display text-lg font-bold uppercase text-[#f8fffa] tracking-wide">
+                  DAILY LATE TRACKER
+                </h2>
               </div>
+              <p className="text-[11px] text-[#c2cbc5] uppercase">
+                TARGET_DATE: {formatDate(selectedDate)} // CALENDAR_DISCIPLINE_AUDIT
+              </p>
             </div>
           </div>
 
           {/* Interactive Date Controls */}
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => shiftDate(-1)}
               title="Previous Day"
-              className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs"
+              className="p-2 bg-[#020303] border border-[#304c3b] hover:border-[#38ff8e] text-[#f8fffa] hover:text-[#38ff8e]"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
 
-            <div className="relative flex-1 sm:w-48">
+            <div className="relative">
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full px-3 py-2 text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 text-center transition-all cursor-pointer"
+                className="px-3 py-1.5 text-xs font-mono font-bold bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] outline-hidden cursor-pointer"
               />
             </div>
 
@@ -97,7 +96,7 @@ export const DailyLateTracker: React.FC<DailyLateTrackerProps> = ({ onSelectPers
               type="button"
               onClick={() => shiftDate(1)}
               title="Next Day"
-              className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs"
+              className="p-2 bg-[#020303] border border-[#304c3b] hover:border-[#38ff8e] text-[#f8fffa] hover:text-[#38ff8e]"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -105,128 +104,97 @@ export const DailyLateTracker: React.FC<DailyLateTrackerProps> = ({ onSelectPers
             <button
               type="button"
               onClick={setToday}
-              className={`px-3 py-2 text-xs font-semibold rounded-xl border transition-all ${
+              className={`px-3 py-1.5 text-xs font-mono font-bold uppercase tracking-wider ${
                 selectedDate === getTodayDateString()
-                  ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  ? 'bg-[#38ff8e] text-[#020303] border border-[#38ff8e]'
+                  : 'bg-[#020303] text-[#d3dbd5] border border-[#304c3b] hover:border-[#38ff8e]'
               }`}
             >
-              Today
+              TODAY
             </button>
           </div>
         </div>
 
-        {/* Selected Date Summary Metrics */}
-        <div className="mt-6 pt-6 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="flex items-center gap-3 p-3.5 bg-slate-50/70 rounded-xl border border-slate-100">
-            <div className="p-2.5 bg-rose-100 text-rose-600 rounded-lg">
-              <Users className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-xs text-slate-500 font-medium">Late People</span>
-              <p className="text-lg font-bold text-slate-900">{totalPeopleLate}</p>
-            </div>
+        {/* Selected Date Facts Matrix */}
+        <div className="mt-4 pt-4 border-t border-[#304c3b] grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+          <div className="flex items-center justify-between p-3 bg-[#020303] border border-[#304c3b]">
+            <span className="text-[11px] text-[#c2cbc5] uppercase">MEMBERS_LATE:</span>
+            <span className="text-base font-bold text-[#f8fffa]">{totalPeopleLate}</span>
           </div>
 
-          <div className="flex items-center gap-3 p-3.5 bg-slate-50/70 rounded-xl border border-slate-100">
-            <div className="p-2.5 bg-amber-100 text-amber-700 rounded-lg">
-              <IndianRupee className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-xs text-slate-500 font-medium">Fine Generated</span>
-              <p className="text-lg font-bold text-slate-900">{formatRupee(totalFineGenerated)}</p>
-            </div>
+          <div className="flex items-center justify-between p-3 bg-[#020303] border border-[#304c3b]">
+            <span className="text-[11px] text-[#c2cbc5] uppercase">FINES_LEVIED:</span>
+            <span className="text-base font-bold text-[#ff65d8]">{formatRupee(totalFineGenerated)}</span>
           </div>
 
-          <div className="flex items-center gap-3 p-3.5 bg-slate-50/70 rounded-xl border border-slate-100">
-            <div className="p-2.5 bg-sky-100 text-sky-700 rounded-lg">
-              <Timer className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-xs text-slate-500 font-medium">Total Delay</span>
-              <p className="text-lg font-bold text-slate-900">{totalDurationStr}</p>
-            </div>
+          <div className="flex items-center justify-between p-3 bg-[#020303] border border-[#304c3b]">
+            <span className="text-[11px] text-[#c2cbc5] uppercase">TOTAL_DELAY_SUM:</span>
+            <span className="text-base font-bold text-[#65f8ff]">{totalDurationStr}</span>
           </div>
         </div>
       </div>
 
-      {/* Date Table or Empty State */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+      {/* Date Table */}
+      <div className="bg-[#090e0b] border border-[#304c3b]">
+        <div className="p-4 border-b border-[#304c3b] flex items-center justify-between bg-[#020303]/50">
           <div>
-            <h3 className="text-base font-bold text-slate-900">
-              Late Attendance on {formatDate(selectedDate)}
+            <h3 className="font-display text-sm font-bold uppercase text-[#f8fffa]">
+              ATTENDANCE_RECORDS // {formatDate(selectedDate)}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Click any row to inspect complete attendance history
+            <p className="text-[10px] text-[#c2cbc5] uppercase mt-0.5">
+              CLICK RECORD TO OPEN DOSSIER
             </p>
           </div>
           {dayEntries.length > 0 && (
             <Badge variant="danger">
-              {dayEntries.length} Recorded
+              {dayEntries.length} LOGGED
             </Badge>
           )}
         </div>
 
         {dayEntries.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse text-xs font-mono">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/60 text-slate-500 text-xs font-semibold uppercase tracking-wider">
-                  <th className="py-3 px-6">Name</th>
-                  <th className="py-3 px-6">Late Duration</th>
-                  <th className="py-3 px-6">Fine</th>
-                  <th className="py-3 px-6">Remarks</th>
-                  <th className="py-3 px-6 text-right">Action</th>
+                <tr className="border-b border-[#304c3b] bg-[#020303] text-[#c2cbc5] text-[10px] uppercase font-bold tracking-wider">
+                  <th className="py-2.5 px-4 border-r border-[#304c3b]">MEMBER_IDENTITY</th>
+                  <th className="py-2.5 px-4 border-r border-[#304c3b]">TARDINESS_OFFSET</th>
+                  <th className="py-2.5 px-4 border-r border-[#304c3b]">PENALTY</th>
+                  <th className="py-2.5 px-4 border-r border-[#304c3b]">INCIDENT_NOTES</th>
+                  <th className="py-2.5 px-4 text-right">ACTION</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
+              <tbody className="divide-y divide-[#304c3b] text-xs">
                 {dayEntries.map((entry) => (
                   <tr
                     key={entry.id}
                     onClick={() => handleRowClick(entry.person_id)}
-                    className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                    className="hover:bg-[#020303] transition-none cursor-pointer group"
                   >
-                    <td className="py-4 px-6 font-semibold text-slate-900 flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-slate-100 text-slate-700 group-hover:bg-rose-100 group-hover:text-rose-700 flex items-center justify-center font-bold text-xs uppercase transition-colors">
+                    <td className="py-3 px-4 font-bold text-[#f8fffa] flex items-center gap-2 border-r border-[#304c3b]">
+                      <div className="w-6 h-6 bg-[#020303] border border-[#304c3b] group-hover:border-[#38ff8e] text-[#38ff8e] flex items-center justify-center text-[10px] font-bold">
                         {entry.person_name.charAt(0)}
                       </div>
-                      <div>
-                        <span className="group-hover:text-rose-600 transition-colors">
-                          {entry.person_name}
-                        </span>
-                        {!entry.person_active && (
-                          <span className="ml-2 text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
-                            Inactive
-                          </span>
-                        )}
-                      </div>
-                    </td>
-
-                    <td className="py-4 px-6 text-slate-600 font-medium">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 border border-amber-200/50 text-xs">
-                        <Clock className="w-3.5 h-3.5 text-amber-600" />
-                        {formatDuration(entry.late_hours, entry.late_minutes)}
+                      <span className="group-hover:text-[#38ff8e]">
+                        {entry.person_name}
                       </span>
                     </td>
 
-                    <td className="py-4 px-6 font-bold text-slate-900">
-                      <Badge variant="danger" size="md">
-                        ₹100
-                      </Badge>
+                    <td className="py-3 px-4 text-[#ff65d8] font-bold border-r border-[#304c3b]">
+                      +{formatDuration(entry.late_hours, entry.late_minutes)}
                     </td>
 
-                    <td className="py-4 px-6 text-xs text-slate-500 max-w-xs truncate">
-                      {entry.remarks ? (
-                        <span>{entry.remarks}</span>
-                      ) : (
-                        <span className="text-slate-300 italic">No remarks</span>
-                      )}
+                    <td className="py-3 px-4 font-bold text-[#38ff8e] border-r border-[#304c3b]">
+                      ₹100.00
                     </td>
 
-                    <td className="py-4 px-6 text-right">
-                      <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-900 underline underline-offset-2">
-                        View History &rarr;
+                    <td className="py-3 px-4 text-[#d3dbd5] max-w-xs truncate border-r border-[#304c3b]">
+                      {entry.remarks || <span className="text-[#304c3b]">[NULL]</span>}
+                    </td>
+
+                    <td className="py-3 px-4 text-right">
+                      <span className="text-[10px] uppercase font-bold text-[#38ff8e] group-hover:underline">
+                        DOSSIER &rarr;
                       </span>
                     </td>
                   </tr>
@@ -237,8 +205,8 @@ export const DailyLateTracker: React.FC<DailyLateTrackerProps> = ({ onSelectPers
         ) : (
           <div className="p-8">
             <EmptyState
-              title="No late entries recorded for this date."
-              message={`Great news! No members were recorded late on ${formatDate(selectedDate)}.`}
+              title="NO LATE ENTRIES RECORDED FOR THIS DATE."
+              message={`Zero recorded infractions on ${formatDate(selectedDate)}. Standard discipline maintained.`}
               icon={CheckCircle}
             />
           </div>

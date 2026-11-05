@@ -4,48 +4,135 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222 47% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222 47% 11%;
-    --radius: 0.75rem;
+    --dp-color-ground: #020303;
+    --dp-color-accent: #38ff8e;
+    --dp-color-interference: #ff65d8;
+    --dp-color-registration: #65f8ff;
+    --dp-color-ink: #f8fffa;
+    --dp-color-ink-body: #d3dbd5;
+    --dp-color-ink-muted: #c2cbc5;
+    --dp-color-plate: #090e0b;
+    --dp-color-line: #304c3b;
+    --dp-color-control-line: #659579;
+    --dp-typography-display: "Cyberpunk Plex Sans", "IBM Plex Sans", sans-serif;
+    --dp-typography-mono: "Cyberpunk Plex Mono", "IBM Plex Mono", monospace;
+    --dp-typography-small: 14px;
+    --dp-typography-label: 12px;
+    --dp-typography-metadata: 11px;
+    --dp-spacing-gutter: clamp(22px, 4.5cqi, 72px);
+    --dp-spacing-column-gap: 50px;
+    --dp-radius-control: 0;
+    --dp-border-hairline: 1px;
+    --dp-motion-interaction: 0s;
+
+    --background: 180 20% 1%;
+    --foreground: 150 100% 98%;
+    --card: 140 22% 5%;
+    --card-foreground: 150 100% 98%;
+    --popover: 140 22% 5%;
+    --popover-foreground: 150 100% 98%;
+    --primary: 146 100% 61%;
+    --primary-foreground: 180 20% 1%;
+    --secondary: 140 22% 8%;
+    --secondary-foreground: 150 100% 98%;
+    --muted: 140 22% 8%;
+    --muted-foreground: 143 6% 78%;
+    --accent: 146 100% 61%;
+    --accent-foreground: 180 20% 1%;
+    --destructive: 315 100% 70%;
+    --destructive-foreground: 180 20% 1%;
+    --border: 145 23% 24%;
+    --input: 145 23% 24%;
+    --ring: 146 100% 61%;
+    --radius: 0px;
   }
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: #0F172A;
-  background-color: #F8FAFC;
+  font-family: var(--dp-typography-mono);
+  background-color: var(--dp-color-ground);
+  color: var(--dp-color-ink-body);
   overflow-x: hidden;
+  letter-spacing: -0.01em;
+  margin: 0;
+  padding: 0;
 }
 
-/* Custom scrollbar */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--dp-typography-display);
+  color: var(--dp-color-ink);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+/* Custom Cyberpunk Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #020303;
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 4px;
+  background: #304c3b;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #38ff8e;
+}
+
+/* Immediate Interaction Token (0s easing) */
+button, a, input, select, textarea {
+  transition: none !important;
+}
+
+/* Diagonal chamfered clip-path for primary actions */
+.clip-corner-diagonal {
+  clip-path: polygon(
+    8px 0%,
+    100% 0%,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    0% 100%,
+    0% 8px
+  );
+}
+
+.clip-corner-accent {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% 100%,
+    10px 100%,
+    0 calc(100% - 10px)
+  );
+}
+
+/* Static hairline scanline overlay */
+.cyber-scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  ),
+  linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+}
+
+/* Green signal rail line */
+.cyber-rail {
+  position: relative;
+}
+.cyber-rail::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background-color: var(--dp-color-accent);
 }

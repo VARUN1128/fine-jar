@@ -12,10 +12,10 @@ import { PersonHistoryModal } from '@/components/public/PersonHistoryModal';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { AdminLoginModal } from '@/components/auth/AdminLoginModal';
 import { PersonSummary } from '@/types/database';
-import { ShieldCheck, Heart, Clock, Github, ExternalLink } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const { isAdmin, loading: authLoading } = useAuth();
+  const { isAdmin } = useAuth();
   const { loading: dataLoading } = useFineTrack();
 
   const [currentView, setCurrentView] = useState<'public' | 'admin'>('public');
@@ -40,7 +40,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between selection:bg-rose-500 selection:text-white">
+    <div className="min-h-screen bg-[#020303] text-[#d3dbd5] flex flex-col justify-between selection:bg-[#38ff8e] selection:text-[#020303] font-mono">
       <div>
         {/* Top Info Banner */}
         <SupabaseBanner />
@@ -53,26 +53,54 @@ export const App: React.FC = () => {
           onNavigateToAdmin={handleAdminAccess}
         />
 
-        {/* Main Public Container */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
-          {/* Public Overview Stats is always visible on top for high-level insight */}
-          <PublicOverview onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
+        {/* Main Content with Green Signal Rail */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+          <div className="cyber-rail pl-4 sm:pl-6 space-y-6">
+            {/* Public Overview & Metrics */}
+            <PublicOverview onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
 
-          {/* Active Public Tab View */}
-          <div className="pt-2">
-            {activeTab === 'daily' && (
-              <DailyLateTracker onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
-            )}
+            {/* Active Tab View */}
+            <div className="pt-2">
+              {activeTab === 'daily' && (
+                <DailyLateTracker onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
+              )}
 
-            {activeTab === 'summary' && (
-              <IndividualSummaryTable onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
-            )}
+              {activeTab === 'summary' && (
+                <IndividualSummaryTable onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
+              )}
 
-            {activeTab === 'all' && (
-              <AllRecordsExplorer onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
-            )}
+              {activeTab === 'all' && (
+                <AllRecordsExplorer onSelectPerson={(person) => setSelectedPersonForHistory(person)} />
+              )}
 
-            {activeTab === 'analytics' && <AnalyticsCharts />}
+              {activeTab === 'analytics' && <AnalyticsCharts />}
+            </div>
+          </div>
+
+          {/* Large Electric Green Statement */}
+          <div className="mt-12 p-6 sm:p-8 bg-[#090e0b] border border-[#304c3b] relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-2 h-2 bg-[#65f8ff]" />
+            <div className="absolute bottom-0 left-0 w-2 h-2 bg-[#ff65d8]" />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <p className="text-[10px] text-[#65f8ff] uppercase tracking-wider mb-1">
+                  // DISCIPLINE_DIRECTIVE_09
+                </p>
+                <h3 className="font-display text-xl sm:text-2xl font-black text-[#38ff8e] uppercase tracking-tight">
+                  PUNCTUALITY IS NON-NEGOTIABLE. SIGNAL OVER NOISE.
+                </h3>
+                <p className="text-xs text-[#c2cbc5] mt-1">
+                  Enforcing standardized operational rigor for modern builders. Flat ₹100 levy recorded dynamically with 0ms replication.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleAdminAccess}
+                className="px-4 py-2 text-xs font-mono font-bold uppercase text-[#020303] bg-[#38ff8e] border border-[#38ff8e] hover:bg-transparent hover:text-[#38ff8e] clip-corner-diagonal shrink-0"
+              >
+                ADMIN_ACCESS_GATE
+              </button>
+            </div>
           </div>
         </main>
       </div>
@@ -91,30 +119,26 @@ export const App: React.FC = () => {
         onSuccess={handleLoginSuccess}
       />
 
-      {/* Footer */}
-      <footer className="mt-16 bg-white border-t border-slate-200/80 py-8 text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* Compact Directory Footer */}
+      <footer className="mt-12 bg-[#090e0b] border-t border-[#304c3b] py-6 text-xs text-[#c2cbc5] font-mono">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-rose-500" />
-            <span className="font-bold text-slate-800">FineTrack</span>
-            <span>—</span>
-            <span>Live Late Tracking & Fine Management System</span>
+            <Terminal className="w-4 h-4 text-[#38ff8e]" />
+            <span className="font-bold text-[#f8fffa] uppercase">FINETRACK // SYS_VERSION_2.0</span>
+            <span className="text-[#304c3b]">|</span>
+            <span className="text-[11px] text-[#c2cbc5]">CYBERPUNK TELEMETRY INTERFACE</span>
           </div>
 
-          <div className="flex items-center gap-4">
-            <span className="inline-flex items-center gap-1">
-              Backend: <strong className="text-slate-800">Supabase PostgreSQL</strong>
-            </span>
-            <span>•</span>
-            <span className="inline-flex items-center gap-1">
-              Fixed rate: <strong className="text-rose-600">₹100 / Late Entry</strong>
-            </span>
-            <span>•</span>
+          <div className="flex items-center gap-3 text-[11px]">
+            <span>POSTGRESQL_RLS: <strong className="text-[#38ff8e]">ACTIVE</strong></span>
+            <span className="text-[#304c3b]">/</span>
+            <span>LEVY: <strong className="text-[#ff65d8]">₹100.00 / DAY</strong></span>
+            <span className="text-[#304c3b]">/</span>
             <button
               onClick={handleAdminAccess}
-              className="text-slate-700 hover:text-slate-900 font-semibold underline underline-offset-2"
+              className="text-[#38ff8e] hover:underline uppercase font-bold"
             >
-              Admin Portal
+              [ADMIN_PORTAL]
             </button>
           </div>
         </div>

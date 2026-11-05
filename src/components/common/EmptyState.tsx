@@ -1,5 +1,5 @@
 import React from 'react';
-import { LucideIcon, Inbox } from 'lucide-react';
+import { LucideIcon, Terminal } from 'lucide-react';
 
 interface EmptyStateProps {
   title?: string;
@@ -10,24 +10,28 @@ interface EmptyStateProps {
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
-  title = 'No records found',
+  title = 'NULL_RECORD_SET',
   message,
-  icon: Icon = Inbox,
+  icon: Icon = Terminal,
   actionLabel,
   onAction,
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50">
-      <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-200 mb-3 text-slate-400">
-        <Icon className="w-8 h-8" />
+    <div className="flex flex-col items-center justify-center py-10 px-4 text-center border border-dashed border-[#304c3b] bg-[#020303]/60 font-mono">
+      <div className="p-3 bg-[#090e0b] border border-[#304c3b] mb-3 text-[#38ff8e]">
+        <Icon className="w-6 h-6" />
       </div>
-      <h4 className="text-base font-semibold text-slate-800">{title}</h4>
-      <p className="text-sm text-slate-500 max-w-sm mt-1 mb-4 leading-relaxed">{message}</p>
+      <h4 className="font-display text-sm font-bold text-[#f8fffa] uppercase tracking-wide">
+        {title}
+      </h4>
+      <p className="text-xs text-[#c2cbc5] max-w-sm mt-1 mb-4 leading-relaxed font-mono">
+        {message}
+      </p>
       {actionLabel && onAction && (
         <button
           type="button"
           onClick={onAction}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-colors shadow-sm"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono font-bold uppercase text-[#020303] bg-[#38ff8e] border border-[#38ff8e] hover:bg-transparent hover:text-[#38ff8e]"
         >
           {actionLabel}
         </button>

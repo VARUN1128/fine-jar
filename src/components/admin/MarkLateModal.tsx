@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from '@/components/common/Modal';
 import { useFineTrack } from '@/context/FineTrackContext';
-import { LateEntryWithPerson, Person } from '@/types/database';
-import { getTodayDateString, formatRupee } from '@/lib/utils';
-import { Clock, Calendar, User, AlertCircle, FileText, CheckCircle2 } from 'lucide-react';
+import { LateEntryWithPerson } from '@/types/database';
+import { getTodayDateString } from '@/lib/utils';
+import { Calendar, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface MarkLateModalProps {
   isOpen: boolean;
@@ -25,7 +25,6 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(25);
   const [remarks, setRemarks] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
@@ -46,18 +45,8 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
     }
     setErrorMsg('');
     setSuccessMsg('');
-    setSearchTerm('');
   }, [entryToEdit, defaultPersonId, people, isOpen]);
 
-  // Filter active people for selector
-  const selectablePeople = people.filter((p) => p.is_active || p.id === personId);
-
-  // Filtered by search
-  const filteredPeople = selectablePeople.filter((p) =>
-    p.full_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Check duplicate status dynamically as user selects person & date
   const isDuplicate = !entryToEdit && lateEntries.some(
     (e) => e.person_id === personId && e.late_date === lateDate
   );
@@ -68,15 +57,15 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
     setSuccessMsg('');
 
     if (!personId) {
-      setErrorMsg('Please select a person.');
+      setErrorMsg('MEMBER_SELECTION_REQUIRED');
       return;
     }
     if (!lateDate) {
-      setErrorMsg('Please select a date.');
+      setErrorMsg('CALENDAR_DATE_REQUIRED');
       return;
     }
     if (hours === 0 && minutes === 0) {
-      setErrorMsg('Late duration must be at least 1 minute.');
+      setErrorMsg('DURATION_MUST_EXCEED_ZERO');
       return;
     }
 
@@ -91,12 +80,10 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
       });
       setLoading(false);
       if (res.success) {
-        setSuccessMsg('Late entry updated successfully!');
-        setTimeout(() => {
-          onClose();
-        }, 800);
+        setSuccessMsg('RECORD_MODIFIED_SUCCESSFULLY');
+        setTimeout(() => onClose(), 800);
       } else {
-        setErrorMsg(res.error || 'Failed to update late entry.');
+        setErrorMsg(res.error || 'FAILED_TO_UPDATE_RECORD');
       }
     } else {
       const res = await markLate({
@@ -108,12 +95,10 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
       });
       setLoading(false);
       if (res.success) {
-        setSuccessMsg('Late attendance marked successfully with ₹100 fine!');
-        setTimeout(() => {
-          onClose();
-        }, 900);
+        setSuccessMsg('TARDINESS_LOGGED // ₹100 LEVIED');
+        setTimeout(() => onClose(), 800);
       } else {
-        setErrorMsg(res.error || 'Failed to record late entry.');
+        setErrorMsg(res.error || 'FAILED_TO_COMMIT_ENTRY');
       }
     }
   };
@@ -122,39 +107,39 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={entryToEdit ? 'Edit Late Entry' : 'Record Late Attendance'}
-      description="Record late arrival. Every recorded late day generates a fixed ₹100 fine."
+      title={entryToEdit ? 'MODIFY_LATE_ENTRY' : 'RECORD_LATE_ATTENDANCE'}
+      description="Record member tardiness. Fixed fine standard: ₹100 per recorded late day."
       maxWidth="md"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 font-mono">
         {errorMsg && (
-          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
-            <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
-            <span className="font-semibold">{errorMsg}</span>
+          <div className="flex items-start gap-2 p-2.5 bg-[#020303] border border-[#ff65d8] text-[#ff65d8] text-xs">
+            <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+            <span className="font-bold">{errorMsg}</span>
           </div>
         )}
 
         {isDuplicate && !errorMsg && (
-          <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
-            <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 p-2.5 bg-[#020303] border border-[#65f8ff] text-[#65f8ff] text-xs">
+            <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
             <span>
-              <strong>Warning:</strong> This person already has a recorded late entry on this date.
-              Submitting will be prevented to avoid duplicates.
+              <strong>CONSTRAINT_LOCK:</strong> Member already recorded late on this date.
+              Database unique constraint blocks duplicate submissions.
             </span>
           </div>
         )}
 
         {successMsg && (
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-            <span className="font-semibold">{successMsg}</span>
+          <div className="flex items-center gap-2 p-2.5 bg-[#020303] border border-[#38ff8e] text-[#38ff8e] text-xs">
+            <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="font-bold">{successMsg}</span>
           </div>
         )}
 
         {/* Person Selector */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
-            Select Person <span className="text-rose-500">*</span>
+          <label className="block text-[10px] font-bold text-[#c2cbc5] uppercase mb-1">
+            MEMBER_IDENTITY <span className="text-[#ff65d8]">*</span>
           </label>
           {entryToEdit ? (
             <input
@@ -162,128 +147,122 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
               readOnly
               disabled
               value={entryToEdit.person_name}
-              className="w-full px-3 py-2 text-xs bg-slate-100 border border-slate-200 rounded-xl text-slate-700 cursor-not-allowed font-semibold"
+              className="w-full px-2.5 py-1.5 text-xs bg-[#020303] border border-[#304c3b] text-[#c2cbc5] cursor-not-allowed font-bold"
             />
           ) : people.length === 0 ? (
-            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
-              No people registered yet. Please add a person first from <strong>Manage People</strong>.
+            <div className="p-2.5 bg-[#020303] border border-[#ff65d8] text-[#ff65d8] text-xs">
+              No members registered. Register member first via <strong>MEMBERS_DIRECTORY</strong>.
             </div>
           ) : (
-            <div className="space-y-1.5">
-              <select
-                required
-                value={personId}
-                onChange={(e) => setPersonId(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 text-slate-900 font-medium"
-              >
-                <option value="">-- Choose person --</option>
-                {people.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.full_name} {!p.is_active ? '(Inactive)' : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              required
+              value={personId}
+              onChange={(e) => setPersonId(e.target.value)}
+              className="w-full px-2.5 py-1.5 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] outline-hidden font-mono"
+            >
+              <option value="">-- SELECT MEMBER --</option>
+              {people.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.full_name} {!p.is_active ? '[INACTIVE]' : ''}
+                </option>
+              ))}
+            </select>
           )}
         </div>
 
         {/* Date Selector */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
-            Date of Late Attendance <span className="text-rose-500">*</span>
+          <label className="block text-[10px] font-bold text-[#c2cbc5] uppercase mb-1">
+            CALENDAR_DATE <span className="text-[#ff65d8]">*</span>
           </label>
           <div className="relative">
-            <Calendar className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Calendar className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#c2cbc5]" />
             <input
               type="date"
               required
               value={lateDate}
               onChange={(e) => setLateDate(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 text-slate-900 font-medium cursor-pointer"
+              className="w-full pl-8 pr-2 py-1.5 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] outline-hidden cursor-pointer"
             />
           </div>
         </div>
 
         {/* Late Duration: Hours & Minutes */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
-            Late Duration (Hours & Minutes) <span className="text-rose-500">*</span>
+          <label className="block text-[10px] font-bold text-[#c2cbc5] uppercase mb-1">
+            DURATION_OFFSET (HOURS & MINUTES) <span className="text-[#ff65d8]">*</span>
           </label>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  min="0"
-                  max="12"
-                  value={hours}
-                  onChange={(e) => setHours(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 text-center font-bold text-slate-900"
-                />
-                <span className="text-xs text-slate-500 font-medium">hrs</span>
-              </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-1.5">
+              <input
+                type="number"
+                min="0"
+                max="12"
+                value={hours}
+                onChange={(e) => setHours(Math.max(0, parseInt(e.target.value, 10) || 0))}
+                className="w-full px-2 py-1 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] text-center font-bold outline-hidden"
+              />
+              <span className="text-[10px] text-[#c2cbc5]">HRS</span>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  min="0"
-                  max="59"
-                  value={minutes}
-                  onChange={(e) =>
-                    setMinutes(Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)))
-                  }
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 text-center font-bold text-slate-900"
-                />
-                <span className="text-xs text-slate-500 font-medium">mins</span>
-              </div>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="number"
+                min="0"
+                max="59"
+                value={minutes}
+                onChange={(e) =>
+                  setMinutes(Math.min(59, Math.max(0, parseInt(e.target.value, 10) || 0)))
+                }
+                className="w-full px-2 py-1 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] text-center font-bold outline-hidden"
+              />
+              <span className="text-[10px] text-[#c2cbc5]">MIN</span>
             </div>
           </div>
         </div>
 
-        {/* Fine Display Card */}
-        <div className="p-3.5 bg-rose-50/70 border border-rose-100 rounded-xl flex items-center justify-between">
-          <div className="space-y-0.5">
-            <span className="text-xs font-semibold text-rose-900">Fine Imposed</span>
-            <p className="text-[11px] text-rose-600">
-              Fixed rate: ₹100 per recorded late day
+        {/* Fine Display Box */}
+        <div className="p-3 bg-[#020303] border border-[#38ff8e] flex items-center justify-between">
+          <div>
+            <span className="text-[10px] font-bold text-[#38ff8e] uppercase block">DETERMINISTIC_LEVY</span>
+            <p className="text-[9px] text-[#c2cbc5]">
+              FIXED RATE: ₹100.00 FLAT PER RECORDED LATE DAY
             </p>
           </div>
-          <span className="text-lg font-extrabold text-rose-700">₹100</span>
+          <span className="text-base font-black text-[#38ff8e]">₹100.00</span>
         </div>
 
         {/* Remarks Input */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 mb-1">
-            Remarks (Optional)
+          <label className="block text-[10px] font-bold text-[#c2cbc5] uppercase mb-1">
+            INCIDENT_NOTES (OPTIONAL)
           </label>
           <textarea
             rows={2}
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
-            placeholder="e.g. Metro delay, traffic congestion, medical emergency"
-            className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 text-slate-800"
+            placeholder="Transit delay, hardware fault, etc."
+            className="w-full px-2.5 py-1 text-xs bg-[#020303] border border-[#304c3b] focus:border-[#38ff8e] text-[#f8fffa] outline-hidden"
           />
         </div>
 
-        {/* Form Actions */}
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+        {/* Actions */}
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#304c3b]">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+            className="px-3 py-1.5 text-xs font-mono font-bold uppercase text-[#c2cbc5] bg-transparent border border-[#304c3b] hover:bg-[#304c3b]"
           >
-            Cancel
+            CANCEL
           </button>
           <button
             type="submit"
-            disabled={loading || isDuplicate}
-            className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all shadow-sm"
+            disabled={loading || isDuplicate || people.length === 0}
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-mono font-bold uppercase text-[#020303] bg-[#38ff8e] border border-[#38ff8e] hover:bg-transparent hover:text-[#38ff8e] disabled:opacity-40 clip-corner-diagonal"
           >
             {loading ? (
-              <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="w-3 h-3 border-2 border-[#020303] border-t-transparent animate-spin" />
             ) : null}
-            <span>{entryToEdit ? 'Save Changes' : 'Confirm & Record (₹100)'}</span>
+            <span>{entryToEdit ? 'UPDATE_RECORD' : 'COMMIT_RECORD (₹100)'}</span>
           </button>
         </div>
       </form>
