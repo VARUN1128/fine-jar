@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, AlertCircle, IndianRupee, Clock, ArrowUpRight, ShieldAlert, Cpu } from 'lucide-react';
+import { Users, AlertCircle, IndianRupee, Clock, ArrowUpRight, ShieldCheck, CheckCircle2, Zap, Database, Hash } from 'lucide-react';
 import { useFineTrack } from '@/context/FineTrackContext';
 import { StatCard } from '@/components/common/StatCard';
 import { Badge } from '@/components/common/Badge';
@@ -24,73 +24,101 @@ export const PublicOverview: React.FC<PublicOverviewProps> = ({ onSelectPerson }
 
   return (
     <div className="space-y-6 font-mono">
-      {/* Top Section with Signal Object & Large Uppercase Title */}
-      <div className="relative p-6 sm:p-8 bg-[#090e0b] border border-[#304c3b]">
-        {/* Registration corner accents */}
+      {/* Redesigned High-Signal Cyberpunk Hero Section */}
+      <div className="relative bg-[#090e0b] border border-[#304c3b] overflow-hidden">
+        {/* Subtle decorative edge markers */}
+        <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[#38ff8e]" />
         <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#65f8ff]" />
         <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[#ff65d8]" />
+        <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#304c3b]" />
 
-        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
-          <div className="space-y-3 max-w-3xl">
-            <div className="flex items-center gap-2 text-[11px] text-[#65f8ff] tracking-wider uppercase">
-              <span className="w-2 h-2 bg-[#38ff8e]" />
-              <span>SUBSYSTEM.FINETRACK // PROTOCOL_01</span>
-              <span className="text-[#304c3b]">/</span>
-              <span className="text-[#c2cbc5]">STATION: PUBLIC_OBSERVER</span>
+        {/* Ambient background glow */}
+        <div className="absolute -top-24 -left-24 w-72 h-72 bg-[#38ff8e]/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="p-6 sm:p-8">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            {/* Left: Headline & Description */}
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-[#020303] border border-[#304c3b] text-[11px]">
+                <span className="w-1.5 h-1.5 bg-[#38ff8e] animate-pulse" />
+                <span className="text-[#38ff8e] font-bold tracking-wider">LIVE TELEMETRY</span>
+                <span className="text-[#304c3b]">/</span>
+                <span className="text-[#c2cbc5]">PUBLIC DISCIPLINE DASHBOARD</span>
+              </div>
+
+              <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl font-black uppercase text-[#f8fffa] tracking-tight leading-tight">
+                Late Tracking <span className="text-[#38ff8e]">&</span> Fine Management
+              </h1>
+
+              <p className="text-xs sm:text-sm text-[#d3dbd5] leading-relaxed">
+                Automated attendance discipline system. Every recorded late arrival incurs a flat fine of{' '}
+                <strong className="text-[#38ff8e] font-bold">₹100</strong>, with database-level constraints strictly enforcing zero duplicate entries per person on any given date.
+              </p>
             </div>
 
-            <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-black uppercase text-[#f8fffa] tracking-tight leading-none">
-              LATE TRACKING // FINE MANAGEMENT
-            </h1>
-
-            <p className="text-xs sm:text-sm text-[#d3dbd5] font-mono leading-relaxed max-w-2xl">
-              Deterministic attendance discipline telemetry. Every recorded tardiness generates a non-negotiable flat fine of <strong className="text-[#38ff8e]">₹100</strong>. PostgreSQL database constraints enforce absolute zero duplicate entries per member per calendar date.
-            </p>
-          </div>
-
-          {/* Compact Geometric Signal Object */}
-          <div className="flex flex-col items-end gap-2 shrink-0">
-            <div className="w-24 h-24 border border-[#304c3b] bg-[#020303] relative p-2 flex flex-col justify-between">
-              <div className="flex justify-between items-center text-[9px] text-[#38ff8e]">
-                <span>SIG_01</span>
-                <span className="w-1.5 h-1.5 bg-[#ff65d8]" />
+            {/* Right: Modern Telemetry Badge */}
+            <div className="shrink-0 flex flex-col sm:flex-row lg:flex-col gap-3">
+              <div className="p-4 bg-[#020303] border border-[#304c3b] flex items-center justify-between gap-6 min-w-[240px]">
+                <div>
+                  <span className="text-[10px] text-[#c2cbc5] uppercase font-bold tracking-wider block">
+                    STANDARD RATE
+                  </span>
+                  <div className="flex items-baseline gap-1 mt-0.5">
+                    <span className="text-2xl font-black text-[#38ff8e]">₹100</span>
+                    <span className="text-[11px] text-[#c2cbc5]">/ LATE DAY</span>
+                  </div>
+                </div>
+                <div className="w-9 h-9 bg-[#090e0b] border border-[#38ff8e]/50 flex items-center justify-center text-[#38ff8e]">
+                  <Zap className="w-5 h-5" />
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-1">
-                <div className="h-2 bg-[#38ff8e]" />
-                <div className="h-2 bg-[#65f8ff]" />
-                <div className="h-2 bg-[#38ff8e]" />
-                <div className="h-2 bg-[#304c3b]" />
-                <div className="h-2 bg-[#38ff8e]" />
-                <div className="h-2 bg-[#ff65d8]" />
-              </div>
-              <div className="text-[8px] text-[#c2cbc5] tracking-tighter">
-                TELEMETRY_LIVE
+
+              <div className="px-3 py-2 bg-[#020303] border border-[#304c3b] flex items-center justify-between text-[11px]">
+                <span className="text-[#c2cbc5] flex items-center gap-1.5">
+                  <Database className="w-3.5 h-3.5 text-[#65f8ff]" />
+                  REPLICATION
+                </span>
+                <span className="text-[#38ff8e] font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-[#38ff8e] rounded-full" />
+                  REALTIME
+                </span>
               </div>
             </div>
-            <div className="text-right">
-              <span className="text-[10px] text-[#c2cbc5]">FINE_STANDARD:</span>
-              <span className="block text-sm font-bold text-[#38ff8e]">₹100.00 / DAY</span>
-            </div>
           </div>
-        </div>
 
-        {/* Tightly Ruled Facts Row */}
-        <div className="mt-6 pt-4 border-t border-[#304c3b] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div className="p-2 bg-[#020303] border border-[#304c3b]">
-            <span className="text-[10px] text-[#c2cbc5] block uppercase">CALCULATION</span>
-            <span className="font-bold text-[#f8fffa]">N × ₹100 CONSTANT</span>
-          </div>
-          <div className="p-2 bg-[#020303] border border-[#304c3b]">
-            <span className="text-[10px] text-[#c2cbc5] block uppercase">INTEGRITY_CHECK</span>
-            <span className="font-bold text-[#65f8ff]">UNIQUE(UID, DATE)</span>
-          </div>
-          <div className="p-2 bg-[#020303] border border-[#304c3b]">
-            <span className="text-[10px] text-[#c2cbc5] block uppercase">SECURITY_MODEL</span>
-            <span className="font-bold text-[#38ff8e]">POSTGRES_RLS</span>
-          </div>
-          <div className="p-2 bg-[#020303] border border-[#304c3b]">
-            <span className="text-[10px] text-[#c2cbc5] block uppercase">SYNC_LATENCY</span>
-            <span className="font-bold text-[#ff65d8]">0ms REPLICATION</span>
+          {/* Bottom Telemetry Facts Bar */}
+          <div className="mt-6 pt-5 border-t border-[#304c3b] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="flex items-center gap-2.5">
+              <div className="w-1.5 h-1.5 bg-[#38ff8e]" />
+              <div>
+                <span className="text-[10px] text-[#c2cbc5] uppercase block">FORMULA</span>
+                <span className="text-xs font-bold text-[#f8fffa]">Entries × ₹100</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <div className="w-1.5 h-1.5 bg-[#65f8ff]" />
+              <div>
+                <span className="text-[10px] text-[#c2cbc5] uppercase block">DUPLICATE LOCK</span>
+                <span className="text-xs font-bold text-[#65f8ff]">1 Entry / Date</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <div className="w-1.5 h-1.5 bg-[#38ff8e]" />
+              <div>
+                <span className="text-[10px] text-[#c2cbc5] uppercase block">SECURITY</span>
+                <span className="text-xs font-bold text-[#38ff8e]">Row-Level Security</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <div className="w-1.5 h-1.5 bg-[#ff65d8]" />
+              <div>
+                <span className="text-[10px] text-[#c2cbc5] uppercase block">ACCESS</span>
+                <span className="text-xs font-bold text-[#ff65d8]">Public (No Login)</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
