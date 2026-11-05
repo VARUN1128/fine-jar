@@ -189,7 +189,9 @@ export const IndividualSummaryTable: React.FC<IndividualSummaryTableProps> = ({ 
             ) : (
               <tr>
                 <td colSpan={5} className="py-12 text-center text-slate-400 text-sm">
-                  No people found matching "{searchQuery}".
+                  {personSummaries.length === 0
+                    ? 'No registered people yet. Authorized admins can add members in the Admin Console.'
+                    : `No people found matching "${searchQuery}".`}
                 </td>
               </tr>
             )}

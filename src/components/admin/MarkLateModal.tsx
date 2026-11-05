@@ -164,6 +164,10 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
               value={entryToEdit.person_name}
               className="w-full px-3 py-2 text-xs bg-slate-100 border border-slate-200 rounded-xl text-slate-700 cursor-not-allowed font-semibold"
             />
+          ) : people.length === 0 ? (
+            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
+              No people registered yet. Please add a person first from <strong>Manage People</strong>.
+            </div>
           ) : (
             <div className="space-y-1.5">
               <select
