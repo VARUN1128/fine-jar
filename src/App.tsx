@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useFineTrack } from '@/context/FineTrackContext';
-import { SupabaseBanner } from '@/components/common/SupabaseBanner';
 import { PublicNavbar } from '@/components/public/PublicNavbar';
 import { PublicOverview } from '@/components/public/PublicOverview';
 import { DailyLateTracker } from '@/components/public/DailyLateTracker';
@@ -42,9 +41,6 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#020303] text-[#d3dbd5] flex flex-col justify-between selection:bg-[#38ff8e] selection:text-[#020303] font-mono">
       <div>
-        {/* Top Info Banner */}
-        <SupabaseBanner />
-
         {/* Public Top Navbar */}
         <PublicNavbar
           activeTab={activeTab}
