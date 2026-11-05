@@ -11,7 +11,7 @@ import { PersonHistoryModal } from '@/components/public/PersonHistoryModal';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { AdminLoginModal } from '@/components/auth/AdminLoginModal';
 import { PersonSummary } from '@/types/database';
-import { Terminal } from 'lucide-react';
+import { Terminal, Heart } from 'lucide-react';
 
 export const App: React.FC = () => {
   const { isAdmin } = useAuth();
@@ -102,17 +102,9 @@ export const App: React.FC = () => {
             <span className="text-[11px] text-[#c2cbc5]">Live Late Tracking & Fine Management</span>
           </div>
 
-          <div className="flex items-center gap-3 text-[11px]">
-            <span>Database: <strong className="text-[#38ff8e]">Supabase PostgreSQL</strong></span>
-            <span className="text-[#304c3b]">/</span>
-            <span>Rate: <strong className="text-[#38ff8e]">₹100 / Late Entry</strong></span>
-            <span className="text-[#304c3b]">/</span>
-            <button
-              onClick={handleAdminAccess}
-              className="text-[#38ff8e] hover:underline uppercase font-bold"
-            >
-              [Admin Login]
-            </button>
+          <div className="flex items-center gap-1.5 text-xs text-[#c2cbc5]">
+            <span>Made by <strong className="text-[#f8fffa] font-semibold">Varun</strong> with</span>
+            <Heart className="w-3.5 h-3.5 text-[#ff65d8] fill-[#ff65d8] inline animate-pulse" />
           </div>
         </div>
       </footer>
