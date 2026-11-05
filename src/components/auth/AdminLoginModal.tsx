@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal } from '@/components/common/Modal';
 import { useAuth } from '@/context/AuthContext';
-import { ShieldCheck, Lock, Mail, AlertCircle, ArrowRight, Eye, EyeOff, Terminal } from 'lucide-react';
+import { Lock, Mail, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 interface AdminLoginModalProps {
   isOpen: boolean;
@@ -41,12 +41,6 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleAutofill = () => {
-    setEmail('fine@gmail.com');
-    setPassword('fine@sof.admn');
-    setErrorMsg('');
   };
 
   return (
@@ -106,15 +100,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-1">
-          <button
-            type="button"
-            onClick={handleAutofill}
-            className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[#38ff8e] bg-[#020303] hover:bg-[#38ff8e] hover:text-[#020303] border border-[#304c3b] px-2 py-0.5 uppercase"
-          >
-            <Terminal className="w-3 h-3 text-[#38ff8e] group-hover:text-[#020303]" />
-            <span>AUTOFILL fine@gmail.com</span>
-          </button>
+        <div className="flex items-center justify-end pt-1">
           <span className="text-[10px] text-[#c2cbc5]">RESTRICTED_ACCESS</span>
         </div>
 
