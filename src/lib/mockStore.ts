@@ -82,7 +82,7 @@ export const INITIAL_ENTRIES: LateEntry[] = [
     late_hours: 0,
     late_minutes: 30,
     fine_amount: 100,
-    is_paid: true,
+    is_paid: false,
     remarks: 'Rain delay',
     created_at: '2026-11-03T09:30:00Z',
   },
@@ -117,7 +117,7 @@ export const INITIAL_ENTRIES: LateEntry[] = [
     late_hours: 0,
     late_minutes: 20,
     fine_amount: 100,
-    is_paid: true,
+    is_paid: false,
     remarks: 'Road repair blockage',
     created_at: '2026-11-02T09:20:00Z',
   },
@@ -195,7 +195,7 @@ export function getStoredEntries(): LateEntry[] {
   try {
     const raw = localStorage.getItem(ENTRIES_STORAGE_KEY);
     if (!raw) {
-      const computed = recalculateAllFines(INITIAL_ENTRIES);
+      const computed = recalculateAllFines<LateEntry>(INITIAL_ENTRIES);
       localStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(computed));
       return computed;
     }
@@ -206,6 +206,7 @@ export function getStoredEntries(): LateEntry[] {
       return computed;
     }
     const recalced = recalculateAllFines<LateEntry>(parsed);
+    localStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(recalced));
     return recalced;
   } catch (e) {
     return recalculateAllFines<LateEntry>(INITIAL_ENTRIES);
