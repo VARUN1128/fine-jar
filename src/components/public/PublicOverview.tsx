@@ -45,7 +45,7 @@ export const PublicOverview: React.FC<PublicOverviewProps> = ({ onSelectPerson }
         <StatCard
           title="Total Fines Generated"
           value={formatRupee(totalFinesGenerated)}
-          subtitle="Fixed ₹100 per late day"
+          subtitle="Progressive monthly scale (₹100 - ₹500)"
           icon={IndianRupee}
           variant="danger"
         />
@@ -183,7 +183,7 @@ export const PublicOverview: React.FC<PublicOverviewProps> = ({ onSelectPerson }
 
                     <div className="flex items-center gap-2">
                       <Badge variant="danger" size="sm">
-                        ₹100 Fine
+                        {formatRupee(entry.fine_amount || 100)} Fine
                       </Badge>
                     </div>
                   </div>

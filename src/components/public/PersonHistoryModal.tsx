@@ -2,9 +2,10 @@ import React from 'react';
 import { Modal } from '@/components/common/Modal';
 import { PersonSummary, LateEntry } from '@/types/database';
 import { useFineTrack } from '@/context/FineTrackContext';
+import { useAuth } from '@/context/AuthContext';
 import { formatDate, formatDuration, formatRupee, exportToCSV } from '@/lib/utils';
 import { Badge } from '@/components/common/Badge';
-import { Clock, Calendar, IndianRupee, Download, CheckCircle, AlertCircle } from 'lucide-react';
+import { Clock, Calendar, IndianRupee, Download, CheckCircle, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface PersonHistoryModalProps {
   person: PersonSummary | null;
@@ -17,7 +18,8 @@ export const PersonHistoryModal: React.FC<PersonHistoryModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { lateEntries } = useFineTrack();
+  const { lateEntries, togglePaymentStatus, markPersonAllPaid } = useFineTrack();
+  const { isAdmin } = useAuth();
 
   if (!person) return null;
 
@@ -92,18 +94,31 @@ export const PersonHistoryModal: React.FC<PersonHistoryModalProps> = ({
         {/* History Table */}
         {historyEntries.length > 0 ? (
           <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
               <h4 className="text-[11px] font-bold text-[#f8fffa] uppercase tracking-wider">
                 LOGGED_EVENTS ({historyEntries.length})
               </h4>
-              <button
-                type="button"
-                onClick={handleExportCSV}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold text-[#38ff8e] bg-[#020303] border border-[#304c3b] hover:border-[#38ff8e] uppercase"
-              >
-                <Download className="w-3 h-3 text-[#38ff8e]" />
-                <span>EXPORT_CSV</span>
-              </button>
+              <div className="flex items-center gap-2">
+                {isAdmin && person.total_outstanding > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => markPersonAllPaid(person.person_id)}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold text-[#020303] bg-[#38ff8e] hover:bg-transparent hover:text-[#38ff8e] border border-[#38ff8e] uppercase clip-corner-diagonal cursor-pointer"
+                    title="Mark all pending fines as paid"
+                  >
+                    <CheckCircle2 className="w-3 h-3" />
+                    <span>MARK ALL PAID (₹{person.total_outstanding})</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleExportCSV}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-bold text-[#38ff8e] bg-[#020303] border border-[#304c3b] hover:border-[#38ff8e] uppercase"
+                >
+                  <Download className="w-3 h-3 text-[#38ff8e]" />
+                  <span>EXPORT_CSV</span>
+                </button>
+              </div>
             </div>
 
             <div className="overflow-x-auto max-h-72 border border-[#304c3b]">
@@ -113,7 +128,7 @@ export const PersonHistoryModal: React.FC<PersonHistoryModalProps> = ({
                     <th className="py-2 px-3 border-r border-[#304c3b]">EVENT_DATE</th>
                     <th className="py-2 px-3 border-r border-[#304c3b]">OFFSET</th>
                     <th className="py-2 px-3 border-r border-[#304c3b]">LEVY</th>
-                    <th className="py-2 px-3 border-r border-[#304c3b]">STATUS</th>
+                    <th className="py-2 px-3 border-r border-[#304c3b]">PAYMENT</th>
                     <th className="py-2 px-3">NOTES</th>
                   </tr>
                 </thead>
@@ -127,13 +142,24 @@ export const PersonHistoryModal: React.FC<PersonHistoryModalProps> = ({
                         +{formatDuration(entry.late_hours, entry.late_minutes)}
                       </td>
                       <td className="py-2 px-3 font-bold text-[#38ff8e] border-r border-[#304c3b] whitespace-nowrap">
-                        ₹100.00
+                        {formatRupee(entry.fine_amount || 100)}
                       </td>
                       <td className="py-2 px-3 border-r border-[#304c3b] whitespace-nowrap">
                         {entry.is_paid ? (
-                          <span className="text-[10px] text-[#38ff8e] uppercase font-bold">
-                            COLLECTED
+                          <span className="inline-flex items-center gap-1 text-[10px] text-[#38ff8e] uppercase font-bold">
+                            <CheckCircle2 className="w-3 h-3 text-[#38ff8e]" />
+                            <span>PAID ✓</span>
                           </span>
+                        ) : isAdmin ? (
+                          <button
+                            type="button"
+                            onClick={() => togglePaymentStatus(entry.id, true)}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase bg-[#38ff8e] text-[#020303] hover:bg-transparent hover:text-[#38ff8e] border border-[#38ff8e] cursor-pointer"
+                            title="Mark this late entry as paid"
+                          >
+                            <CheckCircle2 className="w-2.5 h-2.5" />
+                            <span>MARK PAID</span>
+                          </button>
                         ) : (
                           <span className="text-[10px] text-[#ff65d8] uppercase font-bold">
                             PENDING

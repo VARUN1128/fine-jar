@@ -58,7 +58,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
             TELEMETRY_DASHBOARD_OVERVIEW
           </h2>
           <p className="text-xs text-[#c2cbc5] mt-1 max-w-xl leading-relaxed">
-            Record member attendance exceptions (flat ₹100 levy), audit payment collection status, and enforce database duplicate locks.
+            Record member attendance exceptions (progressive monthly levy: ₹100, ₹200 up to ₹500/day), audit payment collection status, and enforce database duplicate locks.
           </p>
         </div>
 
@@ -77,7 +77,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
             className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono font-bold uppercase text-[#020303] bg-[#38ff8e] border border-[#38ff8e] hover:bg-transparent hover:text-[#38ff8e] clip-corner-diagonal"
           >
             <PlusCircle className="w-3.5 h-3.5" />
-            <span>RECORD_LATE (₹100)</span>
+            <span>RECORD_LATE</span>
           </button>
         </div>
       </div>
@@ -103,7 +103,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
         <StatCard
           title="TOTAL_FINES_LEVIED"
           value={formatRupee(totalFinesGenerated)}
-          subtitle="Fixed standard: ₹100/day"
+          subtitle="Monthly scale: ₹100 to ₹500/day"
           icon={IndianRupee}
           variant="danger"
         />
@@ -173,7 +173,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({
                     <td className="py-2.5 px-3 text-[#ff65d8] font-bold border-r border-[#304c3b]">
                       +{formatDuration(e.late_hours, e.late_minutes)}
                     </td>
-                    <td className="py-2.5 px-3 font-bold text-[#38ff8e] border-r border-[#304c3b]">₹100.00</td>
+                    <td className="py-2.5 px-3 font-bold text-[#38ff8e] border-r border-[#304c3b]">{formatRupee(e.fine_amount || 100)}</td>
                     <td className="py-2.5 px-3 text-[#c2cbc5] max-w-xs truncate">
                       {e.remarks || <span className="text-[#304c3b]">[NULL]</span>}
                     </td>

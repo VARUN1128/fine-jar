@@ -96,7 +96,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onBackToPublic }) => {
                 className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-mono font-bold uppercase text-[#020303] bg-[#38ff8e] border border-[#38ff8e] hover:bg-transparent hover:text-[#38ff8e] clip-corner-diagonal"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
-                <span>RECORD_LATE (₹100)</span>
+                <span>RECORD_LATE</span>
               </button>
             </div>
           </div>

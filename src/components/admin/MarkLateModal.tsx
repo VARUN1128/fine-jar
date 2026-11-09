@@ -3,6 +3,7 @@ import { Modal } from '@/components/common/Modal';
 import { useFineTrack } from '@/context/FineTrackContext';
 import { LateEntryWithPerson } from '@/types/database';
 import { getTodayDateString } from '@/lib/utils';
+import { calculateEntryFineForDate } from '@/utils/fineCalculation';
 import { Calendar, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface MarkLateModalProps {
@@ -51,6 +52,13 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
     (e) => e.person_id === personId && e.late_date === lateDate
   );
 
+  const { occurrence, fineAmount } = calculateEntryFineForDate(
+    lateEntries,
+    personId,
+    lateDate,
+    entryToEdit?.id
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
@@ -95,7 +103,7 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
       });
       setLoading(false);
       if (res.success) {
-        setSuccessMsg('TARDINESS_LOGGED // ₹100 LEVIED');
+        setSuccessMsg(`TARDINESS_LOGGED // ₹${fineAmount} LEVIED`);
         setTimeout(() => onClose(), 800);
       } else {
         setErrorMsg(res.error || 'FAILED_TO_COMMIT_ENTRY');
@@ -108,7 +116,7 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title={entryToEdit ? 'MODIFY_LATE_ENTRY' : 'RECORD_LATE_ATTENDANCE'}
-      description="Record member tardiness. Fixed fine standard: ₹100 per recorded late day."
+      description="Record member tardiness. Progressive monthly rate: ₹100 for 1st day, ₹200 for 2nd day, up to ₹500/day max."
       maxWidth="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4 font-mono">
@@ -223,12 +231,18 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
         {/* Fine Display Box */}
         <div className="p-3 bg-[#020303] border border-[#38ff8e] flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-bold text-[#38ff8e] uppercase block">DETERMINISTIC_LEVY</span>
+            <span className="text-[10px] font-bold text-[#38ff8e] uppercase block">
+              PROGRESSIVE MONTHLY LEVY (DAY #{occurrence} IN MONTH)
+            </span>
             <p className="text-[9px] text-[#c2cbc5]">
-              FIXED RATE: ₹100.00 FLAT PER RECORDED LATE DAY
+              {occurrence === 1 && '1st late day in month: ₹100'}
+              {occurrence === 2 && '2nd late day in month: ₹200'}
+              {occurrence === 3 && '3rd late day in month: ₹300'}
+              {occurrence === 4 && '4th late day in month: ₹400'}
+              {occurrence >= 5 && `${occurrence}th late day in month: ₹500 (capped at ₹500/day)`}
             </p>
           </div>
-          <span className="text-base font-black text-[#38ff8e]">₹100.00</span>
+          <span className="text-base font-black text-[#38ff8e]">₹{fineAmount}.00</span>
         </div>
 
         {/* Remarks Input */}
@@ -262,7 +276,7 @@ export const MarkLateModal: React.FC<MarkLateModalProps> = ({
             {loading ? (
               <span className="w-3 h-3 border-2 border-[#020303] border-t-transparent animate-spin" />
             ) : null}
-            <span>{entryToEdit ? 'UPDATE_RECORD' : 'COMMIT_RECORD (₹100)'}</span>
+            <span>{entryToEdit ? 'UPDATE_RECORD' : `COMMIT_RECORD (₹${fineAmount})`}</span>
           </button>
         </div>
       </form>

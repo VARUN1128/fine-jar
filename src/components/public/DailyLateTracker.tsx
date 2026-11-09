@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Calendar, ChevronLeft, ChevronRight, Clock, Users, IndianRupee, Timer, CheckCircle } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Clock, Users, IndianRupee, Timer, CheckCircle, CheckCircle2 } from 'lucide-react';
 import { useFineTrack } from '@/context/FineTrackContext';
+import { useAuth } from '@/context/AuthContext';
 import { formatDate, formatDuration, formatRupee, getTodayDateString } from '@/lib/utils';
 import { Badge } from '@/components/common/Badge';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -11,7 +12,8 @@ interface DailyLateTrackerProps {
 }
 
 export const DailyLateTracker: React.FC<DailyLateTrackerProps> = ({ onSelectPerson }) => {
-  const { entriesWithPerson, personSummaries } = useFineTrack();
+  const { entriesWithPerson, personSummaries, togglePaymentStatus } = useFineTrack();
+  const { isAdmin } = useAuth();
 
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     return getTodayDateString();
@@ -160,6 +162,7 @@ export const DailyLateTracker: React.FC<DailyLateTrackerProps> = ({ onSelectPers
                   <th className="py-2.5 px-4 border-r border-[#304c3b]">MEMBER_IDENTITY</th>
                   <th className="py-2.5 px-4 border-r border-[#304c3b]">TARDINESS_OFFSET</th>
                   <th className="py-2.5 px-4 border-r border-[#304c3b]">PENALTY</th>
+                  <th className="py-2.5 px-4 border-r border-[#304c3b]">PAYMENT</th>
                   <th className="py-2.5 px-4 border-r border-[#304c3b]">INCIDENT_NOTES</th>
                   <th className="py-2.5 px-4 text-right">ACTION</th>
                 </tr>
@@ -185,7 +188,33 @@ export const DailyLateTracker: React.FC<DailyLateTrackerProps> = ({ onSelectPers
                     </td>
 
                     <td className="py-3 px-4 font-bold text-[#38ff8e] border-r border-[#304c3b]">
-                      ₹100.00
+                      {formatRupee(entry.fine_amount || 100)}
+                    </td>
+
+                    <td className="py-3 px-4 border-r border-[#304c3b] whitespace-nowrap">
+                      {entry.is_paid ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#38ff8e]">
+                          <CheckCircle2 className="w-3 h-3 text-[#38ff8e]" />
+                          <span>PAID ✓</span>
+                        </span>
+                      ) : isAdmin ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            togglePaymentStatus(entry.id, true);
+                          }}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold uppercase bg-[#38ff8e] text-[#020303] hover:bg-transparent hover:text-[#38ff8e] border border-[#38ff8e] clip-corner-diagonal cursor-pointer"
+                          title="Click to mark as paid"
+                        >
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>MARK PAID</span>
+                        </button>
+                      ) : (
+                        <span className="text-[10px] font-bold text-[#ff65d8] uppercase">
+                          PENDING
+                        </span>
+                      )}
                     </td>
 
                     <td className="py-3 px-4 text-[#d3dbd5] max-w-xs truncate border-r border-[#304c3b]">

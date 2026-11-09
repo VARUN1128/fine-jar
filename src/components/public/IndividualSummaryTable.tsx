@@ -159,7 +159,11 @@ export const IndividualSummaryTable: React.FC<IndividualSummaryTableProps> = ({ 
                       </span>
                       {person.total_fine > 0 && (
                         <span className="text-[9px] text-[#c2cbc5]">
-                          {person.total_late_days} × ₹100 CONSTANT
+                          {person.total_outstanding > 0 ? (
+                            <span className="text-[#ff65d8] font-bold">₹{person.total_outstanding} UNPAID</span>
+                          ) : (
+                            <span className="text-[#38ff8e] font-bold">ALL PAID ✓</span>
+                          )}
                         </span>
                       )}
                     </div>

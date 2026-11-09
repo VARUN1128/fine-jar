@@ -30,7 +30,30 @@ CREATE INDEX IF NOT EXISTS idx_late_entries_date ON public.late_entries(late_dat
 CREATE INDEX IF NOT EXISTS idx_late_entries_person_id ON public.late_entries(person_id);
 CREATE INDEX IF NOT EXISTS idx_people_active ON public.people(is_active);
 
--- 3. Automatic updated_at trigger for late_entries
+-- 3. Automatic updated_at and progressive fine calculation
+-- Fine Rules:
+-- 1st day in month: ₹100
+-- 2nd day in month: ₹200
+-- 3rd day in month: ₹300
+-- 4th day in month: ₹400
+-- 5th+ day in month: ₹500 (capped)
+CREATE OR REPLACE FUNCTION public.calculate_progressive_fine(p_person_id UUID, p_late_date DATE)
+RETURNS INTEGER AS $$
+DECLARE
+    v_month_start DATE := date_trunc('month', p_late_date)::DATE;
+    v_month_end DATE := (date_trunc('month', p_late_date) + interval '1 month - 1 day')::DATE;
+    v_count INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO v_count
+    FROM public.late_entries
+    WHERE person_id = p_person_id
+      AND late_date >= v_month_start
+      AND late_date < p_late_date;
+      
+    RETURN LEAST((v_count + 1) * 100, 500);
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN

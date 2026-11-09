@@ -3,6 +3,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { Person, LateEntry, LateEntryWithPerson, PersonSummary, DailySummary } from '@/types/database';
 import { getStoredPeople, saveStoredPeople, getStoredEntries, saveStoredEntries } from '@/lib/mockStore';
 import { getTodayDateString } from '@/lib/utils';
+import { calculateEntryFineForDate, recalculateAllFines } from '@/utils/fineCalculation';
 
 interface FineTrackContextType {
   people: Person[];
@@ -41,6 +42,7 @@ interface FineTrackContextType {
   }) => Promise<{ success: boolean; error?: string }>;
   deleteLateEntry: (id: string) => Promise<{ success: boolean; error?: string }>;
   togglePaymentStatus: (id: string, isPaid: boolean) => Promise<{ success: boolean; error?: string }>;
+  markPersonAllPaid: (personId: string) => Promise<{ success: boolean; error?: string; count?: number }>;
   refreshData: () => Promise<void>;
 }
 
@@ -74,7 +76,7 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         if (entriesError) throw entriesError;
 
         setPeople(peopleData || []);
-        setLateEntries(entriesData || []);
+        setLateEntries(recalculateAllFines(entriesData || []));
         setRealtimeStatus('live');
       } catch (err: any) {
         console.error('Failed to fetch data from Supabase:', err);
@@ -398,7 +400,7 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       };
     }
 
-    const fineAmount = 100; // Fixed ₹100 per late day
+    const { fineAmount } = calculateEntryFineForDate(lateEntries, personId, lateDate);
 
     if (isSupabaseConfigured) {
       try {
@@ -428,7 +430,8 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           throw error;
         }
 
-        setLateEntries((prev) => [data, ...prev]);
+        const recalced = recalculateAllFines([data, ...lateEntries]);
+        setLateEntries(recalced);
         return { success: true, entry: data };
       } catch (err: any) {
         return { success: false, error: err.message || 'Failed to record late entry' };
@@ -445,7 +448,7 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         remarks: remarks?.trim() || null,
         created_at: new Date().toISOString(),
       };
-      const updated = [newEntry, ...lateEntries];
+      const updated = recalculateAllFines([newEntry, ...lateEntries]);
       saveStoredEntries(updated);
       setLateEntries(updated);
       return { success: true, entry: newEntry };
@@ -474,6 +477,14 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     }
 
+    const updatedList = recalculateAllFines(
+      lateEntries.map((e) =>
+        e.id === id
+          ? { ...e, late_date: lateDate, late_hours: hours, late_minutes: minutes, remarks: remarks?.trim() || null }
+          : e
+      )
+    );
+
     if (isSupabaseConfigured) {
       try {
         const { error } = await supabase
@@ -488,64 +499,54 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           .eq('id', id);
 
         if (error) throw error;
-        setLateEntries((prev) =>
-          prev.map((e) =>
-            e.id === id
-              ? { ...e, late_date: lateDate, late_hours: hours, late_minutes: minutes, remarks: remarks?.trim() || null }
-              : e
-          )
-        );
+        setLateEntries(updatedList);
         return { success: true };
       } catch (err: any) {
         return { success: false, error: err.message || 'Failed to update late entry' };
       }
     } else {
-      const updated = lateEntries.map((e) =>
-        e.id === id
-          ? { ...e, late_date: lateDate, late_hours: hours, late_minutes: minutes, remarks: remarks?.trim() || null }
-          : e
-      );
-      saveStoredEntries(updated);
-      setLateEntries(updated);
+      saveStoredEntries(updatedList);
+      setLateEntries(updatedList);
       return { success: true };
     }
   };
 
   // 6. Delete Late Entry (automatic recalculation of totals)
   const deleteLateEntry = async (id: string) => {
+    const remaining = recalculateAllFines(lateEntries.filter((e) => e.id !== id));
     if (isSupabaseConfigured) {
       try {
         const { error } = await supabase.from('late_entries').delete().eq('id', id);
         if (error) throw error;
-        setLateEntries((prev) => prev.filter((e) => e.id !== id));
+        setLateEntries(remaining);
         return { success: true };
       } catch (err: any) {
         return { success: false, error: err.message || 'Failed to delete late entry' };
       }
     } else {
-      const updated = lateEntries.filter((e) => e.id !== id);
-      saveStoredEntries(updated);
-      setLateEntries(updated);
+      saveStoredEntries(remaining);
+      setLateEntries(remaining);
       return { success: true };
     }
   };
 
   // 7. Toggle Payment Status
   const togglePaymentStatus = async (id: string, isPaid: boolean) => {
+    const nowIso = isPaid ? new Date().toISOString() : null;
     if (isSupabaseConfigured) {
       try {
         const { error } = await supabase
           .from('late_entries')
           .update({
             is_paid: isPaid,
-            paid_at: isPaid ? new Date().toISOString() : null,
+            paid_at: nowIso,
           })
           .eq('id', id);
 
         if (error) throw error;
         setLateEntries((prev) =>
           prev.map((e) =>
-            e.id === id ? { ...e, is_paid: isPaid, paid_at: isPaid ? new Date().toISOString() : null } : e
+            e.id === id ? { ...e, is_paid: isPaid, paid_at: nowIso } : e
           )
         );
         return { success: true };
@@ -554,11 +555,51 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     } else {
       const updated = lateEntries.map((e) =>
-        e.id === id ? { ...e, is_paid: isPaid, paid_at: isPaid ? new Date().toISOString() : null } : e
+        e.id === id ? { ...e, is_paid: isPaid, paid_at: nowIso } : e
       );
       saveStoredEntries(updated);
       setLateEntries(updated);
       return { success: true };
+    }
+  };
+
+  // 8. Mark All Fines for a Person as Paid
+  const markPersonAllPaid = async (personId: string) => {
+    const unpaidEntries = lateEntries.filter((e) => e.person_id === personId && !e.is_paid);
+    if (unpaidEntries.length === 0) {
+      return { success: true, count: 0 };
+    }
+
+    const nowIso = new Date().toISOString();
+
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase
+          .from('late_entries')
+          .update({
+            is_paid: true,
+            paid_at: nowIso,
+          })
+          .eq('person_id', personId)
+          .eq('is_paid', false);
+
+        if (error) throw error;
+        setLateEntries((prev) =>
+          prev.map((e) =>
+            e.person_id === personId ? { ...e, is_paid: true, paid_at: nowIso } : e
+          )
+        );
+        return { success: true, count: unpaidEntries.length };
+      } catch (err: any) {
+        return { success: false, error: err.message || 'Failed to update payment status' };
+      }
+    } else {
+      const updated = lateEntries.map((e) =>
+        e.person_id === personId ? { ...e, is_paid: true, paid_at: nowIso } : e
+      );
+      saveStoredEntries(updated);
+      setLateEntries(updated);
+      return { success: true, count: unpaidEntries.length };
     }
   };
 
@@ -586,6 +627,7 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         updateLateEntry,
         deleteLateEntry,
         togglePaymentStatus,
+        markPersonAllPaid,
         refreshData: fetchData,
       }}
     >

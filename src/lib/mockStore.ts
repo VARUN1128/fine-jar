@@ -1,4 +1,5 @@
 import { Person, LateEntry } from '@/types/database';
+import { recalculateAllFines } from '@/utils/fineCalculation';
 
 const PEOPLE_STORAGE_KEY = 'finetrack_people_data';
 const ENTRIES_STORAGE_KEY = 'finetrack_entries_data';
@@ -194,17 +195,20 @@ export function getStoredEntries(): LateEntry[] {
   try {
     const raw = localStorage.getItem(ENTRIES_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(INITIAL_ENTRIES));
-      return INITIAL_ENTRIES;
+      const computed = recalculateAllFines(INITIAL_ENTRIES);
+      localStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(computed));
+      return computed;
     }
-    const parsed = JSON.parse(raw);
-    if (parsed.length === 0) {
-      localStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(INITIAL_ENTRIES));
-      return INITIAL_ENTRIES;
+    const parsed: LateEntry[] = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      const computed = recalculateAllFines<LateEntry>(INITIAL_ENTRIES);
+      localStorage.setItem(ENTRIES_STORAGE_KEY, JSON.stringify(computed));
+      return computed;
     }
-    return parsed;
+    const recalced = recalculateAllFines<LateEntry>(parsed);
+    return recalced;
   } catch (e) {
-    return INITIAL_ENTRIES;
+    return recalculateAllFines<LateEntry>(INITIAL_ENTRIES);
   }
 }
 

@@ -268,23 +268,31 @@ export const LateRecordsTable: React.FC<LateRecordsTableProps> = ({ onOpenNewLat
                     </td>
 
                     <td className="py-2.5 px-3 font-bold text-[#38ff8e] border-r border-[#304c3b] whitespace-nowrap">
-                      ₹100.00
+                      {formatRupee(record.fine_amount || 100)}
                     </td>
 
                     <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap">
-                      <button
-                        type="button"
-                        onClick={() => togglePaymentStatus(record.id, !record.is_paid)}
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase border transition-none ${
-                          record.is_paid
-                            ? 'bg-[#020303] text-[#38ff8e] border-[#38ff8e]'
-                            : 'bg-[#020303] text-[#ff65d8] border-[#ff65d8]'
-                        }`}
-                        title="TOGGLE_STATUS"
-                      >
-                        <CheckCircle2 className="w-2.5 h-2.5" />
-                        <span>{record.is_paid ? 'COLLECTED' : 'PENDING'}</span>
-                      </button>
+                      {record.is_paid ? (
+                        <button
+                          type="button"
+                          onClick={() => togglePaymentStatus(record.id, false)}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold uppercase bg-[#020303] text-[#38ff8e] border border-[#38ff8e] hover:border-[#ff65d8] hover:text-[#ff65d8] cursor-pointer"
+                          title="Click to revert to PENDING"
+                        >
+                          <CheckCircle2 className="w-3 h-3 text-[#38ff8e]" />
+                          <span>PAID ✓</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => togglePaymentStatus(record.id, true)}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold uppercase bg-[#38ff8e] text-[#020303] hover:bg-transparent hover:text-[#38ff8e] border border-[#38ff8e] clip-corner-diagonal cursor-pointer"
+                          title="Mark this late entry as PAID"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>MARK PAID</span>
+                        </button>
+                      )}
                     </td>
 
                     <td className="py-2.5 px-3 text-[#c2cbc5] max-w-xs truncate border-r border-[#304c3b]">

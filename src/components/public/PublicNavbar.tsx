@@ -36,7 +36,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
                   FineTrack
                 </span>
                 <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 bg-[#090e0b] text-[#38ff8e] border border-[#304c3b]">
-                  ₹100/Late Day
+                  ₹100 - ₹500/Day
                 </span>
               </div>
               <p className="text-[10px] text-[#c2cbc5] font-mono uppercase tracking-wider hidden sm:block">

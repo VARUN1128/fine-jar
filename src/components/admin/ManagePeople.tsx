@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, UserPlus, Edit3, Trash2, Power, History, PlusCircle } from 'lucide-react';
+import { Search, UserPlus, Edit3, Trash2, Power, History, PlusCircle, CheckCircle2 } from 'lucide-react';
 import { useFineTrack } from '@/context/FineTrackContext';
 import { Person, PersonSummary } from '@/types/database';
 import { formatRupee, formatDate } from '@/lib/utils';
@@ -10,7 +10,7 @@ import { PersonHistoryModal } from '@/components/public/PersonHistoryModal';
 import { MarkLateModal } from './MarkLateModal';
 
 export const ManagePeople: React.FC = () => {
-  const { people, personSummaries, deletePerson, updatePerson } = useFineTrack();
+  const { people, personSummaries, deletePerson, updatePerson, markPersonAllPaid } = useFineTrack();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -19,6 +19,7 @@ export const ManagePeople: React.FC = () => {
   const [viewingHistoryPerson, setViewingHistoryPerson] = useState<PersonSummary | null>(null);
   const [markLatePersonId, setMarkLatePersonId] = useState<string | null>(null);
   const [loadingAction, setLoadingAction] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const combinedPeopleList = useMemo(() => {
     return people
@@ -29,10 +30,22 @@ export const ManagePeople: React.FC = () => {
           ...p,
           total_late_days: summary?.total_late_days || 0,
           total_fine: summary?.total_fine || 0,
+          total_paid: summary?.total_paid || 0,
+          total_outstanding: summary?.total_outstanding || 0,
           latest_late_date: summary?.latest_late_date || null,
         };
       });
   }, [people, personSummaries, searchQuery]);
+
+  const handleMarkPaid = async (personId: string, name: string) => {
+    setLoadingAction(true);
+    const res = await markPersonAllPaid(personId);
+    setLoadingAction(false);
+    if (res.success) {
+      setToastMessage(`✓ Marked all pending fines as PAID for ${name}`);
+      setTimeout(() => setToastMessage(null), 3500);
+    }
+  };
 
   const handleToggleActive = async (person: Person) => {
     await updatePerson(person.id, person.full_name, !person.is_active);
@@ -85,6 +98,19 @@ export const ManagePeople: React.FC = () => {
         </div>
       </div>
 
+      {/* Notification Toast */}
+      {toastMessage && (
+        <div className="p-3 bg-[#020303] border border-[#38ff8e] text-[#38ff8e] text-xs font-bold flex items-center justify-between">
+          <span>{toastMessage}</span>
+          <button
+            onClick={() => setToastMessage(null)}
+            className="text-[10px] text-[#c2cbc5] hover:text-[#f8fffa] uppercase"
+          >
+            [DISMISS]
+          </button>
+        </div>
+      )}
+
       {/* People Table */}
       <div className="bg-[#090e0b] border border-[#304c3b]">
         <div className="overflow-x-auto">
@@ -95,7 +121,8 @@ export const ManagePeople: React.FC = () => {
                 <th className="py-2.5 px-4 border-r border-[#304c3b]">SYSTEM_UUID</th>
                 <th className="py-2.5 px-4 text-center border-r border-[#304c3b]">STATUS</th>
                 <th className="py-2.5 px-4 text-center border-r border-[#304c3b]">LATE_DAYS</th>
-                <th className="py-2.5 px-4 border-r border-[#304c3b]">CUMULATIVE_LEVY</th>
+                <th className="py-2.5 px-4 border-r border-[#304c3b]">TOTAL_FINE</th>
+                <th className="py-2.5 px-4 border-r border-[#304c3b]">PAYMENT_STATUS</th>
                 <th className="py-2.5 px-4 text-right">CONTROLS</th>
               </tr>
             </thead>
@@ -143,6 +170,28 @@ export const ManagePeople: React.FC = () => {
 
                     <td className="py-2.5 px-4 font-bold text-[#38ff8e] border-r border-[#304c3b]">
                       {formatRupee(person.total_fine)}
+                    </td>
+
+                    <td className="py-2.5 px-4 border-r border-[#304c3b] whitespace-nowrap">
+                      {person.total_outstanding > 0 ? (
+                        <button
+                          type="button"
+                          disabled={loadingAction}
+                          onClick={() => handleMarkPaid(person.id, person.full_name)}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold uppercase bg-[#38ff8e] text-[#020303] hover:bg-transparent hover:text-[#38ff8e] border border-[#38ff8e] clip-corner-diagonal cursor-pointer"
+                          title={`Click to mark all pending fines (₹${person.total_outstanding}) as paid`}
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>PAID (₹{person.total_outstanding})</span>
+                        </button>
+                      ) : person.total_late_days > 0 ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#38ff8e]">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#38ff8e]" />
+                          <span>ALL PAID ✓</span>
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-[#304c3b]">— NO FINES —</span>
+                      )}
                     </td>
 
                     <td className="py-2.5 px-4 text-right">
@@ -204,7 +253,7 @@ export const ManagePeople: React.FC = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-[#c2cbc5] text-xs">
+                  <td colSpan={7} className="py-8 text-center text-[#c2cbc5] text-xs">
                     [EMPTY_RECORD_SET] NO MEMBERS REGISTERED.
                   </td>
                 </tr>

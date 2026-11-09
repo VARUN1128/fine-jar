@@ -216,7 +216,7 @@ export const AllRecordsExplorer: React.FC<AllRecordsExplorerProps> = ({ onSelect
             </Badge>
           </div>
           <span className="text-[10px] text-[#c2cbc5] uppercase">
-            SUM_FINE: <strong className="text-[#38ff8e]">{formatRupee(filteredEntries.length * 100)}</strong>
+            SUM_FINE: <strong className="text-[#38ff8e]">{formatRupee(filteredEntries.reduce((s, e) => s + (e.fine_amount || 100), 0))}</strong>
           </span>
         </div>
 
@@ -229,6 +229,7 @@ export const AllRecordsExplorer: React.FC<AllRecordsExplorerProps> = ({ onSelect
                   <th className="py-2.5 px-3 border-r border-[#304c3b]">CALENDAR_DATE</th>
                   <th className="py-2.5 px-3 border-r border-[#304c3b]">DELAY_RECORD</th>
                   <th className="py-2.5 px-3 border-r border-[#304c3b]">LEVY</th>
+                  <th className="py-2.5 px-3 border-r border-[#304c3b]">PAYMENT</th>
                   <th className="py-2.5 px-3 border-r border-[#304c3b]">REMARKS</th>
                   <th className="py-2.5 px-3 text-right">ACTION</th>
                 </tr>
@@ -261,7 +262,15 @@ export const AllRecordsExplorer: React.FC<AllRecordsExplorerProps> = ({ onSelect
                     </td>
 
                     <td className="py-2.5 px-3 font-bold text-[#38ff8e] border-r border-[#304c3b] whitespace-nowrap">
-                      ₹100.00
+                      {formatRupee(entry.fine_amount || 100)}
+                    </td>
+
+                    <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap">
+                      {entry.is_paid ? (
+                        <span className="text-[10px] text-[#38ff8e] font-bold uppercase">PAID ✓</span>
+                      ) : (
+                        <span className="text-[10px] text-[#ff65d8] font-bold uppercase">PENDING</span>
+                      )}
                     </td>
 
                     <td className="py-2.5 px-3 text-[#c2cbc5] max-w-xs truncate border-r border-[#304c3b]">
