@@ -12,7 +12,7 @@ interface LateRecordsTableProps {
 }
 
 export const LateRecordsTable: React.FC<LateRecordsTableProps> = ({ onOpenNewLateModal }) => {
-  const { entriesWithPerson, people, deleteLateEntry, togglePaymentStatus } = useFineTrack();
+  const { entriesWithPerson, people, personSummaries, deleteLateEntry, togglePaymentStatus } = useFineTrack();
 
   const [searchName, setSearchName] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState('');
@@ -256,7 +256,8 @@ export const LateRecordsTable: React.FC<LateRecordsTableProps> = ({ onOpenNewLat
                 <th className="py-2.5 px-3 border-r border-[#304c3b]">MEMBER</th>
                 <th className="py-2.5 px-3 border-r border-[#304c3b]">CALENDAR_DATE</th>
                 <th className="py-2.5 px-3 border-r border-[#304c3b]">OFFSET</th>
-                <th className="py-2.5 px-3 border-r border-[#304c3b]">LEVY</th>
+                <th className="py-2.5 px-3 border-r border-[#304c3b]">DAILY_LEVY</th>
+                <th className="py-2.5 px-3 border-r border-[#304c3b]">CUMULATIVE_LEVY</th>
                 <th className="py-2.5 px-3 border-r border-[#304c3b]">SETTLEMENT</th>
                 <th className="py-2.5 px-3 border-r border-[#304c3b]">INCIDENT_NOTES</th>
                 <th className="py-2.5 px-3 text-right">ACTION</th>
@@ -264,92 +265,119 @@ export const LateRecordsTable: React.FC<LateRecordsTableProps> = ({ onOpenNewLat
             </thead>
             <tbody className="divide-y divide-[#304c3b] text-[#f8fffa]">
               {filteredRecords.length > 0 ? (
-                filteredRecords.map((record) => (
-                  <tr key={record.id} className="hover:bg-[#020303] transition-none">
-                    <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] flex items-center gap-2">
-                      <div className="w-5 h-5 bg-[#020303] border border-[#304c3b] text-[#38ff8e] flex items-center justify-center font-bold text-[9px] uppercase">
-                        {record.person_name.charAt(0)}
-                      </div>
-                      <div>
-                        <span className="font-bold text-[#f8fffa]">{record.person_name}</span>
-                        {!record.person_active && (
-                          <span className="ml-1 text-[8px] text-[#ff65d8] border border-[#ff65d8] px-1 py-0.2">
-                            INACTIVE
+                filteredRecords.map((record) => {
+                  const personSummary = personSummaries.find((p) => p.person_id === record.person_id);
+                  return (
+                    <tr key={record.id} className="hover:bg-[#020303] transition-none">
+                      <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] flex items-center gap-2">
+                        <div className="w-5 h-5 bg-[#020303] border border-[#304c3b] text-[#38ff8e] flex items-center justify-center font-bold text-[9px] uppercase">
+                          {record.person_name.charAt(0)}
+                        </div>
+                        <div>
+                          <span className="font-bold text-[#f8fffa]">{record.person_name}</span>
+                          {!record.person_active && (
+                            <span className="ml-1 text-[8px] text-[#ff65d8] border border-[#ff65d8] px-1 py-0.2">
+                              INACTIVE
+                            </span>
+                          )}
+                          <div className="text-[9px] text-[#c2cbc5] font-mono">
+                            {personSummary ? `${personSummary.total_late_days} Late Days` : ''}
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap text-[#d3dbd5]">
+                        {formatDate(record.late_date)}
+                      </td>
+
+                      <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap text-[#ff65d8] font-bold">
+                        +{formatDuration(record.late_hours, record.late_minutes)}
+                      </td>
+
+                      <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] whitespace-nowrap">
+                        <div className="flex flex-col">
+                          <span className="text-[#f8fffa] font-bold">{formatRupee(record.fine_amount || 100)}</span>
+                          <span className="text-[8px] text-[#c2cbc5]">
+                            {record.fine_amount === 100
+                              ? 'DAY #1 IN MO.'
+                              : record.fine_amount === 200
+                              ? 'DAY #2 IN MO.'
+                              : record.fine_amount === 300
+                              ? 'DAY #3 IN MO.'
+                              : record.fine_amount === 400
+                              ? 'DAY #4 IN MO.'
+                              : 'DAY #5+ IN MO.'}
                           </span>
+                        </div>
+                      </td>
+
+                      <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] whitespace-nowrap">
+                        <div className="flex flex-col">
+                          <span className="text-[#38ff8e] font-bold text-sm">
+                            {formatRupee(personSummary?.total_fine || record.fine_amount || 100)}
+                          </span>
+                          <span className="text-[8px] text-[#ff65d8]">
+                            {personSummary && personSummary.total_outstanding > 0
+                              ? `${formatRupee(personSummary.total_outstanding)} UNPAID`
+                              : 'SETTLED ✓'}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap">
+                        {record.is_paid ? (
+                          <button
+                            type="button"
+                            onClick={() => togglePaymentStatus(record.id, false)}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold uppercase bg-[#020303] text-[#38ff8e] border border-[#38ff8e] hover:border-[#ff65d8] hover:text-[#ff65d8] cursor-pointer"
+                            title="Click to revert to PENDING"
+                          >
+                            <CheckCircle2 className="w-3 h-3 text-[#38ff8e]" />
+                            <span>PAID ✓</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => togglePaymentStatus(record.id, true)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold uppercase bg-[#38ff8e] text-[#020303] hover:bg-transparent hover:text-[#38ff8e] border border-[#38ff8e] clip-corner-diagonal cursor-pointer"
+                            title="Mark this late entry as PAID"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>MARK PAID</span>
+                          </button>
                         )}
-                      </div>
-                    </td>
+                      </td>
 
-                    <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap text-[#d3dbd5]">
-                      {formatDate(record.late_date)}
-                    </td>
+                      <td className="py-2.5 px-3 text-[#c2cbc5] max-w-xs truncate border-r border-[#304c3b]">
+                        {record.remarks || <span className="text-[#304c3b]">[NULL]</span>}
+                      </td>
 
-                    <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap text-[#ff65d8] font-bold">
-                      +{formatDuration(record.late_hours, record.late_minutes)}
-                    </td>
-
-                    <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] whitespace-nowrap">
-                      <div className="flex flex-col">
-                        <span className="text-[#38ff8e]">{formatRupee(record.fine_amount || 100)}</span>
-                        <span className="text-[8px] text-[#c2cbc5]">
-                          {record.fine_amount === 100 ? 'DAY #1 IN MO.' : record.fine_amount === 200 ? 'DAY #2 IN MO.' : record.fine_amount === 300 ? 'DAY #3 IN MO.' : record.fine_amount === 400 ? 'DAY #4 IN MO.' : 'DAY #5+ IN MO.'}
-                        </span>
-                      </div>
-                    </td>
-
-                    <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap">
-                      {record.is_paid ? (
-                        <button
-                          type="button"
-                          onClick={() => togglePaymentStatus(record.id, false)}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold uppercase bg-[#020303] text-[#38ff8e] border border-[#38ff8e] hover:border-[#ff65d8] hover:text-[#ff65d8] cursor-pointer"
-                          title="Click to revert to PENDING"
-                        >
-                          <CheckCircle2 className="w-3 h-3 text-[#38ff8e]" />
-                          <span>PAID ✓</span>
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => togglePaymentStatus(record.id, true)}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold uppercase bg-[#38ff8e] text-[#020303] hover:bg-transparent hover:text-[#38ff8e] border border-[#38ff8e] clip-corner-diagonal cursor-pointer"
-                          title="Mark this late entry as PAID"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>MARK PAID</span>
-                        </button>
-                      )}
-                    </td>
-
-                    <td className="py-2.5 px-3 text-[#c2cbc5] max-w-xs truncate border-r border-[#304c3b]">
-                      {record.remarks || <span className="text-[#304c3b]">[NULL]</span>}
-                    </td>
-
-                    <td className="py-2.5 px-3 text-right whitespace-nowrap">
-                      <div className="inline-flex items-center gap-1">
-                        <button
-                          type="button"
-                          title="Edit late record"
-                          onClick={() => setEditingEntry(record)}
-                          className="p-1 border border-[#304c3b] text-[#d3dbd5] hover:text-[#38ff8e] hover:border-[#38ff8e]"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          title="Delete record"
-                          onClick={() => setDeletingEntry(record)}
-                          className="p-1 border border-[#304c3b] text-[#ff65d8] hover:bg-[#ff65d8] hover:text-[#020303]"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                        <div className="inline-flex items-center gap-1">
+                          <button
+                            type="button"
+                            title="Edit late record"
+                            onClick={() => setEditingEntry(record)}
+                            className="p-1 border border-[#304c3b] text-[#d3dbd5] hover:text-[#38ff8e] hover:border-[#38ff8e]"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            title="Delete record"
+                            onClick={() => setDeletingEntry(record)}
+                            className="p-1 border border-[#304c3b] text-[#ff65d8] hover:bg-[#ff65d8] hover:text-[#020303]"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-[#c2cbc5] text-xs">
+                  <td colSpan={8} className="py-8 text-center text-[#c2cbc5] text-xs">
                     [NULL_QUERY] NO RECORDS MATCH SELECTION CRITERIA.
                   </td>
                 </tr>
