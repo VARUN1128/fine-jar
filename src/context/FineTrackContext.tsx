@@ -154,12 +154,17 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
   }, []);
 
+  // Calibrated entries: guarantee progressive monthly fines are applied dynamically
+  const calibratedEntries = useMemo<LateEntry[]>(() => {
+    return recalculateAllFines(lateEntries);
+  }, [lateEntries]);
+
   // Joined entries with person details
   const entriesWithPerson = useMemo<LateEntryWithPerson[]>(() => {
     const peopleMap = new Map<string, Person>();
     people.forEach((p) => peopleMap.set(p.id, p));
 
-    return lateEntries.map((entry) => {
+    return calibratedEntries.map((entry) => {
       const person = peopleMap.get(entry.person_id);
       return {
         ...entry,
@@ -167,7 +172,7 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         person_active: person ? person.is_active : false,
       };
     });
-  }, [people, lateEntries]);
+  }, [people, calibratedEntries]);
 
   // Aggregates per person
   const personSummaries = useMemo<PersonSummary[]>(() => {
@@ -190,8 +195,8 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       });
     });
 
-    // Accumulate from entries
-    lateEntries.forEach((entry) => {
+    // Accumulate from calibrated entries
+    calibratedEntries.forEach((entry) => {
       const existing = map.get(entry.person_id);
       if (existing) {
         existing.total_late_days += 1;
@@ -223,13 +228,13 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         ...data,
       };
     });
-  }, [people, lateEntries]);
+  }, [people, calibratedEntries]);
 
   // Aggregates by day
   const dailySummaries = useMemo<DailySummary[]>(() => {
     const map = new Map<string, { entries_count: number; total_fine: number; total_minutes: number }>();
 
-    lateEntries.forEach((entry) => {
+    calibratedEntries.forEach((entry) => {
       const existing = map.get(entry.late_date) || { entries_count: 0, total_fine: 0, total_minutes: 0 };
       existing.entries_count += 1;
       existing.total_fine += (entry.fine_amount || 100);
@@ -243,25 +248,25 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         ...stats,
       }))
       .sort((a, b) => b.date.localeCompare(a.date));
-  }, [lateEntries]);
+  }, [calibratedEntries]);
 
   // High-level statistics
   const totalRegisteredPeople = useMemo(() => people.filter(p => p.is_active).length, [people]);
-  const totalLateEntries = lateEntries.length;
+  const totalLateEntries = calibratedEntries.length;
   const totalFinesGenerated = useMemo(
-    () => lateEntries.reduce((sum, e) => sum + (e.fine_amount || 100), 0),
-    [lateEntries]
+    () => calibratedEntries.reduce((sum, e) => sum + (e.fine_amount || 100), 0),
+    [calibratedEntries]
   );
   const totalFinesCollected = useMemo(
-    () => lateEntries.filter((e) => e.is_paid).reduce((sum, e) => sum + (e.fine_amount || 100), 0),
-    [lateEntries]
+    () => calibratedEntries.filter((e) => e.is_paid).reduce((sum, e) => sum + (e.fine_amount || 100), 0),
+    [calibratedEntries]
   );
   const totalOutstandingFines = totalFinesGenerated - totalFinesCollected;
 
   const todayDateString = getTodayDateString();
   const todayLateCount = useMemo(
-    () => lateEntries.filter((e) => e.late_date === todayDateString).length,
-    [lateEntries, todayDateString]
+    () => calibratedEntries.filter((e) => e.late_date === todayDateString).length,
+    [calibratedEntries, todayDateString]
   );
 
   const mostLatePerson = useMemo(() => {
@@ -607,7 +612,7 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     <FineTrackContext.Provider
       value={{
         people,
-        lateEntries,
+        lateEntries: calibratedEntries,
         entriesWithPerson,
         personSummaries,
         dailySummaries,

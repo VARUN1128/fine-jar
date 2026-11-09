@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
@@ -26,21 +27,30 @@ interface AdminLayoutProps {
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ onBackToPublic }) => {
   const { user, signOut } = useAuth();
   const { realtimeStatus } = useFineTrack();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const [activeSection, setActiveSection] = useState<'overview' | 'people' | 'records'>('overview');
+  const getActiveSection = (): 'overview' | 'people' | 'records' => {
+    const p = location.pathname;
+    if (p.includes('/records') || p.includes('/late-records')) return 'records';
+    if (p.includes('/people')) return 'people';
+    return 'overview';
+  };
+
+  const activeSection = getActiveSection();
   const [isMarkLateOpen, setIsMarkLateOpen] = useState(false);
   const [isAddPersonOpen, setIsAddPersonOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
-    onBackToPublic();
+    navigate('/daily');
   };
 
   const navItems = [
-    { id: 'overview', label: 'TELEMETRY_OVERVIEW', icon: LayoutDashboard },
-    { id: 'records', label: 'LATE_RECORDS_MATRIX', icon: ClipboardList },
-    { id: 'people', label: 'MEMBERS_DIRECTORY', icon: Users },
+    { id: 'overview', label: 'TELEMETRY_OVERVIEW', icon: LayoutDashboard, path: '/admin/overview' },
+    { id: 'records', label: 'LATE_RECORDS_MATRIX', icon: ClipboardList, path: '/admin/records' },
+    { id: 'people', label: 'MEMBERS_DIRECTORY', icon: Users, path: '/admin/people' },
   ];
 
   return (
@@ -113,7 +123,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onBackToPublic }) => {
                 <button
                   key={item.id}
                   onClick={() => {
-                    setActiveSection(item.id as any);
+                    navigate(item.path);
                     setIsMobileMenuOpen(false);
                   }}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-mono font-bold uppercase tracking-wider text-left border ${
@@ -141,7 +151,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onBackToPublic }) => {
 
           <button
             type="button"
-            onClick={onBackToPublic}
+            onClick={() => navigate('/daily')}
             className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-mono font-bold uppercase text-[#c2cbc5] hover:text-[#f8fffa] border border-[#304c3b] hover:border-[#65f8ff]"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-[#65f8ff]" />
@@ -165,8 +175,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onBackToPublic }) => {
           <AdminOverview
             onOpenMarkLate={() => setIsMarkLateOpen(true)}
             onOpenAddPerson={() => setIsAddPersonOpen(true)}
-            onNavigateToRecords={() => setActiveSection('records')}
-            onNavigateToPeople={() => setActiveSection('people')}
+            onNavigateToRecords={() => navigate('/admin/records')}
+            onNavigateToPeople={() => navigate('/admin/people')}
           />
         )}
 

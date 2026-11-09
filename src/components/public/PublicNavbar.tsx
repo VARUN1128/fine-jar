@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ShieldCheck, Terminal, Radio } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useFineTrack } from '@/context/FineTrackContext';
@@ -6,18 +7,28 @@ import { useFineTrack } from '@/context/FineTrackContext';
 interface PublicNavbarProps {
   onOpenLogin: () => void;
   onNavigateToAdmin: () => void;
-  activeTab: 'daily' | 'summary' | 'all' | 'analytics';
-  setActiveTab: (tab: 'daily' | 'summary' | 'all' | 'analytics') => void;
+  activeTab?: 'daily' | 'summary' | 'all' | 'analytics';
+  setActiveTab?: (tab: 'daily' | 'summary' | 'all' | 'analytics') => void;
 }
 
 export const PublicNavbar: React.FC<PublicNavbarProps> = ({
   onOpenLogin,
   onNavigateToAdmin,
-  activeTab,
-  setActiveTab,
 }) => {
   const { isAdmin } = useAuth();
   const { realtimeStatus } = useFineTrack();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const getActiveTab = () => {
+    const p = location.pathname;
+    if (p.startsWith('/summary')) return 'summary';
+    if (p.startsWith('/records') || p.startsWith('/all')) return 'all';
+    if (p.startsWith('/analytics') || p.startsWith('/charts')) return 'analytics';
+    return 'daily';
+  };
+
+  const activeTab = getActiveTab();
 
   return (
     <header className="sticky top-0 z-40 bg-[#020303]/95 backdrop-blur-xs border-b border-[#304c3b] font-mono">
@@ -48,7 +59,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
           {/* Navigation Controls */}
           <nav className="hidden md:flex items-center border border-[#304c3b] bg-[#090e0b]">
             <button
-              onClick={() => setActiveTab('daily')}
+              onClick={() => navigate('/daily')}
               className={`px-3.5 py-1.5 text-xs font-mono uppercase font-bold tracking-wider ${
                 activeTab === 'daily'
                   ? 'bg-[#38ff8e] text-[#020303]'
@@ -58,7 +69,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
               Daily Tracker
             </button>
             <button
-              onClick={() => setActiveTab('summary')}
+              onClick={() => navigate('/summary')}
               className={`px-3.5 py-1.5 text-xs font-mono uppercase font-bold tracking-wider border-l border-[#304c3b] ${
                 activeTab === 'summary'
                   ? 'bg-[#38ff8e] text-[#020303]'
@@ -68,7 +79,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
               Individual Summary
             </button>
             <button
-              onClick={() => setActiveTab('all')}
+              onClick={() => navigate('/records')}
               className={`px-3.5 py-1.5 text-xs font-mono uppercase font-bold tracking-wider border-l border-[#304c3b] ${
                 activeTab === 'all'
                   ? 'bg-[#38ff8e] text-[#020303]'
@@ -78,7 +89,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
               All Records & Filters
             </button>
             <button
-              onClick={() => setActiveTab('analytics')}
+              onClick={() => navigate('/analytics')}
               className={`px-3.5 py-1.5 text-xs font-mono uppercase font-bold tracking-wider border-l border-[#304c3b] ${
                 activeTab === 'analytics'
                   ? 'bg-[#38ff8e] text-[#020303]'
@@ -116,7 +127,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
         {/* Mobile Navigation Tabs */}
         <div className="flex md:hidden items-center justify-between py-2 border-t border-[#304c3b] overflow-x-auto gap-1">
           <button
-            onClick={() => setActiveTab('daily')}
+            onClick={() => navigate('/daily')}
             className={`px-2.5 py-1 text-[11px] font-mono uppercase font-bold whitespace-nowrap ${
               activeTab === 'daily' ? 'bg-[#38ff8e] text-[#020303]' : 'text-[#c2cbc5] border border-[#304c3b]'
             }`}
@@ -124,7 +135,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
             Daily Tracker
           </button>
           <button
-            onClick={() => setActiveTab('summary')}
+            onClick={() => navigate('/summary')}
             className={`px-2.5 py-1 text-[11px] font-mono uppercase font-bold whitespace-nowrap ${
               activeTab === 'summary' ? 'bg-[#38ff8e] text-[#020303]' : 'text-[#c2cbc5] border border-[#304c3b]'
             }`}
@@ -132,7 +143,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
             Summary
           </button>
           <button
-            onClick={() => setActiveTab('all')}
+            onClick={() => navigate('/records')}
             className={`px-2.5 py-1 text-[11px] font-mono uppercase font-bold whitespace-nowrap ${
               activeTab === 'all' ? 'bg-[#38ff8e] text-[#020303]' : 'text-[#c2cbc5] border border-[#304c3b]'
             }`}
@@ -140,7 +151,7 @@ export const PublicNavbar: React.FC<PublicNavbarProps> = ({
             All Records
           </button>
           <button
-            onClick={() => setActiveTab('analytics')}
+            onClick={() => navigate('/analytics')}
             className={`px-2.5 py-1 text-[11px] font-mono uppercase font-bold whitespace-nowrap ${
               activeTab === 'analytics' ? 'bg-[#38ff8e] text-[#020303]' : 'text-[#c2cbc5] border border-[#304c3b]'
             }`}

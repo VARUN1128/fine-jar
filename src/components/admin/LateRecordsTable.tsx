@@ -228,6 +228,27 @@ export const LateRecordsTable: React.FC<LateRecordsTableProps> = ({ onOpenNewLat
 
       {/* Late Records Table */}
       <div className="bg-[#090e0b] border border-[#304c3b]">
+        <div className="p-3 border-b border-[#304c3b] flex flex-wrap items-center justify-between gap-2 bg-[#020303]/50">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] uppercase font-bold text-[#c2cbc5]">
+              FILTERED_EVENTS: <strong className="text-[#38ff8e]">{filteredRecords.length}</strong>
+            </span>
+          </div>
+          <div className="flex items-center gap-3 text-[10px] font-mono">
+            <span>
+              TOTAL_LEVY: <strong className="text-[#38ff8e]">{formatRupee(filteredRecords.reduce((s, e) => s + (e.fine_amount || 100), 0))}</strong>
+            </span>
+            <span className="text-[#304c3b]">|</span>
+            <span>
+              OUTSTANDING: <strong className="text-[#ff65d8]">{formatRupee(filteredRecords.filter(e => !e.is_paid).reduce((s, e) => s + (e.fine_amount || 100), 0))}</strong>
+            </span>
+            <span className="text-[#304c3b]">|</span>
+            <span>
+              COLLECTED: <strong className="text-[#38ff8e]">{formatRupee(filteredRecords.filter(e => e.is_paid).reduce((s, e) => s + (e.fine_amount || 100), 0))}</strong>
+            </span>
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead className="bg-[#020303] text-[#c2cbc5] font-bold uppercase text-[10px] border-b border-[#304c3b]">
@@ -267,8 +288,13 @@ export const LateRecordsTable: React.FC<LateRecordsTableProps> = ({ onOpenNewLat
                       +{formatDuration(record.late_hours, record.late_minutes)}
                     </td>
 
-                    <td className="py-2.5 px-3 font-bold text-[#38ff8e] border-r border-[#304c3b] whitespace-nowrap">
-                      {formatRupee(record.fine_amount || 100)}
+                    <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] whitespace-nowrap">
+                      <div className="flex flex-col">
+                        <span className="text-[#38ff8e]">{formatRupee(record.fine_amount || 100)}</span>
+                        <span className="text-[8px] text-[#c2cbc5]">
+                          {record.fine_amount === 100 ? 'DAY #1 IN MO.' : record.fine_amount === 200 ? 'DAY #2 IN MO.' : record.fine_amount === 300 ? 'DAY #3 IN MO.' : record.fine_amount === 400 ? 'DAY #4 IN MO.' : 'DAY #5+ IN MO.'}
+                        </span>
+                      </div>
                     </td>
 
                     <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap">
