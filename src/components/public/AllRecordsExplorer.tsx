@@ -227,7 +227,7 @@ export const AllRecordsExplorer: React.FC<AllRecordsExplorerProps> = ({ onSelect
                 <tr>
                   <th className="py-2.5 px-3 border-r border-[#304c3b]">MEMBER</th>
                   <th className="py-2.5 px-3 border-r border-[#304c3b]">CALENDAR_DATE</th>
-                  <th className="py-2.5 px-3 border-r border-[#304c3b]">DELAY_RECORD</th>
+                  <th className="py-2.5 px-3 border-r border-[#304c3b]">DELAY_OFFSET</th>
                   <th className="py-2.5 px-3 border-r border-[#304c3b]">LEVY</th>
                   <th className="py-2.5 px-3 border-r border-[#304c3b]">PAYMENT</th>
                   <th className="py-2.5 px-3 border-r border-[#304c3b]">REMARKS</th>
@@ -235,55 +235,81 @@ export const AllRecordsExplorer: React.FC<AllRecordsExplorerProps> = ({ onSelect
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#304c3b] text-[#f8fffa]">
-                {filteredEntries.map((entry) => (
-                  <tr
-                    key={entry.id}
-                    className="hover:bg-[#020303] transition-none cursor-pointer group"
-                    onClick={() => {
-                      const p = personSummaries.find((x) => x.person_id === entry.person_id);
-                      if (p) onSelectPerson(p);
-                    }}
-                  >
-                    <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] flex items-center gap-2">
-                      <div className="w-5 h-5 bg-[#020303] border border-[#304c3b] group-hover:border-[#38ff8e] text-[#38ff8e] flex items-center justify-center font-bold text-[9px] uppercase">
-                        {entry.person_name.charAt(0)}
-                      </div>
-                      <span className="group-hover:text-[#38ff8e]">
-                        {entry.person_name}
-                      </span>
-                    </td>
+                {filteredEntries.map((entry) => {
+                  const personSummary = personSummaries.find((p) => p.person_id === entry.person_id);
+                  const fine = entry.fine_amount || 100;
+                  const dayBadge =
+                    fine === 100
+                      ? '1ST LATE IN MO.'
+                      : fine === 200
+                      ? '2ND LATE IN MO.'
+                      : fine === 300
+                      ? '3RD LATE IN MO.'
+                      : fine === 400
+                      ? '4TH LATE IN MO.'
+                      : '5TH+ LATE IN MO.';
 
-                    <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap text-[#d3dbd5]">
-                      {formatDate(entry.late_date)}
-                    </td>
+                  return (
+                    <tr
+                      key={entry.id}
+                      className="hover:bg-[#020303] transition-none cursor-pointer group"
+                      onClick={() => {
+                        if (personSummary) onSelectPerson(personSummary);
+                      }}
+                    >
+                      <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] flex items-center gap-2">
+                        <div className="w-5 h-5 bg-[#020303] border border-[#304c3b] group-hover:border-[#38ff8e] text-[#38ff8e] flex items-center justify-center font-bold text-[9px] uppercase">
+                          {entry.person_name.charAt(0)}
+                        </div>
+                        <div>
+                          <span className="group-hover:text-[#38ff8e] block">
+                            {entry.person_name}
+                          </span>
+                          <span className="text-[9px] text-[#c2cbc5] font-mono">
+                            {personSummary ? `${personSummary.total_late_days} Late Days Total` : ''}
+                          </span>
+                        </div>
+                      </td>
 
-                    <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap text-[#ff65d8] font-bold">
-                      +{formatDuration(entry.late_hours, entry.late_minutes)}
-                    </td>
+                      <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap text-[#d3dbd5]">
+                        {formatDate(entry.late_date)}
+                      </td>
 
-                    <td className="py-2.5 px-3 font-bold text-[#38ff8e] border-r border-[#304c3b] whitespace-nowrap">
-                      {formatRupee(entry.fine_amount || 100)}
-                    </td>
+                      <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap text-[#ff65d8] font-bold">
+                        +{formatDuration(entry.late_hours, entry.late_minutes)}
+                      </td>
 
-                    <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap">
-                      {entry.is_paid ? (
-                        <span className="text-[10px] text-[#38ff8e] font-bold uppercase">PAID ✓</span>
-                      ) : (
-                        <span className="text-[10px] text-[#ff65d8] font-bold uppercase">PENDING</span>
-                      )}
-                    </td>
+                      <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] whitespace-nowrap">
+                        <div className="flex flex-col">
+                          <span className="text-[#38ff8e] font-bold text-sm">{formatRupee(fine)}</span>
+                          <span className="text-[8px] text-[#c2cbc5] tracking-tight">{dayBadge}</span>
+                        </div>
+                      </td>
 
-                    <td className="py-2.5 px-3 text-[#c2cbc5] max-w-xs truncate border-r border-[#304c3b]">
-                      {entry.remarks || <span className="text-[#304c3b]">[NULL]</span>}
-                    </td>
+                      <td className="py-2.5 px-3 border-r border-[#304c3b] whitespace-nowrap">
+                        {entry.is_paid ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] text-[#38ff8e] font-bold uppercase">
+                            PAID ✓
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] text-[#ff65d8] border border-[#ff65d8] font-bold uppercase">
+                            UNPAID
+                          </span>
+                        )}
+                      </td>
 
-                    <td className="py-2.5 px-3 text-right">
-                      <span className="text-[10px] font-bold text-[#38ff8e] group-hover:underline uppercase">
-                        INSPECT
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                      <td className="py-2.5 px-3 text-[#c2cbc5] max-w-xs truncate border-r border-[#304c3b]">
+                        {entry.remarks || <span className="text-[#304c3b]">[NULL]</span>}
+                      </td>
+
+                      <td className="py-2.5 px-3 text-right">
+                        <span className="text-[10px] font-bold text-[#38ff8e] group-hover:underline uppercase">
+                          DOSSIER &rarr;
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

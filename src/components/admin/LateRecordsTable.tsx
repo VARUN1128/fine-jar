@@ -256,8 +256,7 @@ export const LateRecordsTable: React.FC<LateRecordsTableProps> = ({ onOpenNewLat
                 <th className="py-2.5 px-3 border-r border-[#304c3b]">MEMBER</th>
                 <th className="py-2.5 px-3 border-r border-[#304c3b]">CALENDAR_DATE</th>
                 <th className="py-2.5 px-3 border-r border-[#304c3b]">OFFSET</th>
-                <th className="py-2.5 px-3 border-r border-[#304c3b]">DAILY_LEVY</th>
-                <th className="py-2.5 px-3 border-r border-[#304c3b]">CUMULATIVE_LEVY</th>
+                <th className="py-2.5 px-3 border-r border-[#304c3b]">LEVY</th>
                 <th className="py-2.5 px-3 border-r border-[#304c3b]">SETTLEMENT</th>
                 <th className="py-2.5 px-3 border-r border-[#304c3b]">INCIDENT_NOTES</th>
                 <th className="py-2.5 px-3 text-right">ACTION</th>
@@ -267,6 +266,18 @@ export const LateRecordsTable: React.FC<LateRecordsTableProps> = ({ onOpenNewLat
               {filteredRecords.length > 0 ? (
                 filteredRecords.map((record) => {
                   const personSummary = personSummaries.find((p) => p.person_id === record.person_id);
+                  const fine = record.fine_amount || 100;
+                  const dayBadge =
+                    fine === 100
+                      ? '1ST LATE IN MO.'
+                      : fine === 200
+                      ? '2ND LATE IN MO.'
+                      : fine === 300
+                      ? '3RD LATE IN MO.'
+                      : fine === 400
+                      ? '4TH LATE IN MO.'
+                      : '5TH+ LATE IN MO.';
+
                   return (
                     <tr key={record.id} className="hover:bg-[#020303] transition-none">
                       <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] flex items-center gap-2">
@@ -281,7 +292,7 @@ export const LateRecordsTable: React.FC<LateRecordsTableProps> = ({ onOpenNewLat
                             </span>
                           )}
                           <div className="text-[9px] text-[#c2cbc5] font-mono">
-                            {personSummary ? `${personSummary.total_late_days} Late Days` : ''}
+                            {personSummary ? `${personSummary.total_late_days} Late Days Total` : ''}
                           </div>
                         </div>
                       </td>
@@ -296,31 +307,8 @@ export const LateRecordsTable: React.FC<LateRecordsTableProps> = ({ onOpenNewLat
 
                       <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="text-[#f8fffa] font-bold">{formatRupee(record.fine_amount || 100)}</span>
-                          <span className="text-[8px] text-[#c2cbc5]">
-                            {record.fine_amount === 100
-                              ? 'DAY #1 IN MO.'
-                              : record.fine_amount === 200
-                              ? 'DAY #2 IN MO.'
-                              : record.fine_amount === 300
-                              ? 'DAY #3 IN MO.'
-                              : record.fine_amount === 400
-                              ? 'DAY #4 IN MO.'
-                              : 'DAY #5+ IN MO.'}
-                          </span>
-                        </div>
-                      </td>
-
-                      <td className="py-2.5 px-3 font-bold border-r border-[#304c3b] whitespace-nowrap">
-                        <div className="flex flex-col">
-                          <span className="text-[#38ff8e] font-bold text-sm">
-                            {formatRupee(personSummary?.total_fine || record.fine_amount || 100)}
-                          </span>
-                          <span className="text-[8px] text-[#ff65d8]">
-                            {personSummary && personSummary.total_outstanding > 0
-                              ? `${formatRupee(personSummary.total_outstanding)} UNPAID`
-                              : 'SETTLED ✓'}
-                          </span>
+                          <span className="text-[#38ff8e] font-bold text-sm">{formatRupee(fine)}</span>
+                          <span className="text-[8px] text-[#c2cbc5] tracking-tight">{dayBadge}</span>
                         </div>
                       </td>
 

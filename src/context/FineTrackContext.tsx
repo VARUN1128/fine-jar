@@ -75,9 +75,30 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
         if (entriesError) throw entriesError;
 
+        const rawList = entriesData || [];
+        const recalcedList = recalculateAllFines(rawList);
+
         setPeople(peopleData || []);
-        setLateEntries(recalculateAllFines(entriesData || []));
+        setLateEntries(recalcedList);
         setRealtimeStatus('live');
+
+        // Automatically sync and persist recalculated fine_amounts to Supabase database
+        const outOfSync = recalcedList.filter((recalced) => {
+          const original = rawList.find((o) => o.id === recalced.id);
+          return original && original.fine_amount !== recalced.fine_amount;
+        });
+
+        if (outOfSync.length > 0) {
+          console.log(`[FineTrack] Reconciling ${outOfSync.length} entries to Supabase progressive rates...`);
+          Promise.all(
+            outOfSync.map((item) =>
+              supabase
+                .from('late_entries')
+                .update({ fine_amount: item.fine_amount })
+                .eq('id', item.id)
+            )
+          ).catch((e) => console.warn('Supabase auto-sync notice:', e));
+        }
       } catch (err: any) {
         console.error('Failed to fetch data from Supabase:', err);
         setRealtimeStatus('offline');
@@ -437,6 +458,21 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
         const recalced = recalculateAllFines([data, ...lateEntries]);
         setLateEntries(recalced);
+
+        // Sync any shifted sibling entries to Supabase
+        const shifted = recalced.filter((r) => {
+          if (r.id === data.id) return false;
+          const old = lateEntries.find((l) => l.id === r.id);
+          return old && old.fine_amount !== r.fine_amount;
+        });
+        if (shifted.length > 0) {
+          Promise.all(
+            shifted.map((item) =>
+              supabase.from('late_entries').update({ fine_amount: item.fine_amount }).eq('id', item.id)
+            )
+          ).catch(console.warn);
+        }
+
         return { success: true, entry: data };
       } catch (err: any) {
         return { success: false, error: err.message || 'Failed to record late entry' };
@@ -524,6 +560,20 @@ export const FineTrackProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const { error } = await supabase.from('late_entries').delete().eq('id', id);
         if (error) throw error;
         setLateEntries(remaining);
+
+        // Sync any shifted fines to Supabase
+        const shifted = remaining.filter((r) => {
+          const old = lateEntries.find((l) => l.id === r.id);
+          return old && old.fine_amount !== r.fine_amount;
+        });
+        if (shifted.length > 0) {
+          Promise.all(
+            shifted.map((item) =>
+              supabase.from('late_entries').update({ fine_amount: item.fine_amount }).eq('id', item.id)
+            )
+          ).catch(console.warn);
+        }
+
         return { success: true };
       } catch (err: any) {
         return { success: false, error: err.message || 'Failed to delete late entry' };
